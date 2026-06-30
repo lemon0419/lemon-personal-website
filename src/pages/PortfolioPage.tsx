@@ -2,7 +2,29 @@ import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { t } from '@/lib/i18n';
-import { Sun, Moon, Sparkles, ArrowLeft, ExternalLink, MessageSquareText } from 'lucide-react';
+import {
+  Sun, Moon, Sparkles, ArrowLeft, ExternalLink, MessageSquareText,
+  Gamepad2, Library
+} from 'lucide-react';
+
+const PROJECTS = [
+  {
+    id: 'project1',
+    descId: 'project1Desc',
+    url: '/works/sudoku.html',
+    color: 'hsl(30 50% 90%)',
+    icon: Gamepad2,
+    typeLabel: 'webProject',
+  },
+  {
+    id: 'project2',
+    descId: 'project2Desc',
+    url: '/works/prototypes.html',
+    color: 'hsl(210 25% 92%)',
+    icon: Library,
+    typeLabel: 'webProject',
+  },
+];
 
 const ARTICLES = [
   { id: 'article1', url: 'https://mp.weixin.qq.com/s/XBVZgWBNEST4x3hKpdiFLg', color: 'hsl(15 55% 90%)' },
@@ -24,16 +46,24 @@ function PaperClip({ className }: { className?: string }) {
 }
 
 // 作品卡片
-function ArticleCard({
+function WorkCard({
   title,
+  subtitle,
   url,
   color,
   index,
+  typeIcon: TypeIcon,
+  typeLabel,
+  actionLabel,
 }: {
   title: string;
+  subtitle: string;
   url: string;
   color: string;
   index: number;
+  typeIcon: typeof Gamepad2;
+  typeLabel: string;
+  actionLabel: string;
 }) {
   return (
     <div
@@ -65,21 +95,26 @@ function ArticleCard({
 
         {/* 类型标签 */}
         <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-background/60 text-muted-foreground mb-3">
-          <MessageSquareText className="w-3 h-3" />
-          <span>{t('zh' as any, 'wechatArticle')}</span>
+          <TypeIcon className="w-3 h-3" />
+          <span>{typeLabel}</span>
         </div>
 
         {/* 标题 */}
         <h3
-          className="text-base font-bold text-foreground leading-snug mb-3 pr-4"
+          className="text-base font-bold text-foreground leading-snug mb-1 pr-4"
           style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
         >
           {title}
         </h3>
 
+        {/* 副标题 */}
+        <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+          {subtitle}
+        </p>
+
         {/* 底部按钮 */}
         <div className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-accent transition-colors">
-          <span>{t('zh' as any, 'viewOriginal')}</span>
+          <span>{actionLabel}</span>
           <ExternalLink className="w-3 h-3" />
         </div>
       </div>
@@ -158,17 +193,69 @@ export default function PortfolioPage() {
           <div className="w-16 h-px bg-border" />
         </div>
 
-        {/* 作品网格 */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {ARTICLES.map((article, index) => (
-            <ArticleCard
-              key={article.id}
-              title={t(locale, article.id as any)}
-              url={article.url}
-              color={article.color}
-              index={index}
-            />
-          ))}
+        {/* 个人项目区 */}
+        <section className="space-y-5">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-primary" />
+            <h2
+              className="text-base md:text-lg font-bold text-foreground"
+              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+            >
+              {t(locale, 'projectSection')}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {PROJECTS.map((project, index) => (
+              <WorkCard
+                key={project.id}
+                title={t(locale, project.id as any)}
+                subtitle={t(locale, project.descId as any)}
+                url={project.url}
+                color={project.color}
+                index={index}
+                typeIcon={project.icon}
+                typeLabel={t(locale, project.typeLabel as any)}
+                actionLabel={t(locale, 'viewProject')}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* 装饰分隔 */}
+        <div className="flex items-center justify-center gap-3">
+          <div className="w-16 h-px bg-border" />
+          <div className="w-2 h-2 rounded-full bg-accent/50" />
+          <div className="w-16 h-px bg-border" />
+        </div>
+
+        {/* 公众号推文区 */}
+        <section className="space-y-5">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-accent" />
+            <h2
+              className="text-base md:text-lg font-bold text-foreground"
+              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+            >
+              {t(locale, 'articleSection')}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {ARTICLES.map((article, index) => (
+              <WorkCard
+                key={article.id}
+                title={t(locale, article.id as any)}
+                subtitle=""
+                url={article.url}
+                color={article.color}
+                index={index + PROJECTS.length}
+                typeIcon={MessageSquareText}
+                typeLabel={t(locale, 'wechatArticle')}
+                actionLabel={t(locale, 'viewOriginal')}
+              />
+            ))}
+          </div>
         </section>
       </main>
 
