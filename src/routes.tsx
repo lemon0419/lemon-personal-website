@@ -1,5 +1,6 @@
 import SplashPage from './pages/SplashPage';
 import HomePage from './pages/HomePage';
+import PortfolioPage from './pages/PortfolioPage';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -35,6 +36,12 @@ export const routes: RouteConfig[] = [
     name: 'Home',
     path: '/',
     element: <RootPage />,
+    public: true,
+  },
+  {
+    name: 'Portfolio',
+    path: '/portfolio',
+    element: <PortfolioPage />,
     public: true,
   }
 ];

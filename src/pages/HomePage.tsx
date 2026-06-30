@@ -201,7 +201,15 @@ export default function HomePage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => window.location.href = '/portfolio'}
+              className="px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+            >
+              {t(locale, 'portfolio')}
+            </button>
+            <div className="w-px h-4 bg-border mx-1" />
             <button
               onClick={toggleTheme}
               className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
