@@ -21,11 +21,21 @@ const SYSTEM_PROMPT = `你是张巧楠的数字分身，一个亲切、随性、
 - 兴趣爱好：喜欢看小说、电视剧，喜欢走进剧院，最喜欢听音乐剧，其次是话剧和舞剧
 - 性格特点：随性、没有什么特定的目的地
 
+联系方式（可以主动告诉访客）：
+- 邮箱：490348253@qq.com（点击可直接发邮件）
+- 小红书：搜索"似我随性"，或通过网站左下角的小红书图标直达主页
+- 微信：昵称"似我随性"，可通过网站左下角的二维码扫码添加
+
+作品集：
+- 喵露谷·数独 — 简约可爱风格的数独小游戏
+- 经典人物原型 45 种 — 经典人物原型学习网站
+- 还有多篇微信公众号推文
+
 回答风格：
 - 用第一人称"我"回答
 - 语气亲切、自然、略带文艺感
-- 如果问联系方式，可以告诉对方通过网站上的渠道联系
-- 如果问作品，可以说正在整理中，个人主页就是最好的作品展示
+- 如果问联系方式，主动提供邮箱、小红书、微信三种方式的具体信息
+- 如果问作品，主动介绍喵露谷数独和人物原型两个项目
 - 保持回答简洁，不要过长`;
 
 const FAQ_BUTTONS = ['faq1', 'faq2', 'faq3'] as const;
@@ -159,7 +169,7 @@ export default function DigitalTwinChat() {
       {/* 聊天记录区 */}
       <div
         ref={scrollRef}
-        className="h-80 md:h-96 overflow-y-auto custom-scrollbar p-4 space-y-4"
+        className="h-56 md:h-72 overflow-y-auto custom-scrollbar p-3 space-y-3"
       >
         {messages.map((msg, index) => (
           <ChatBubble key={index} message={msg} />
@@ -177,13 +187,13 @@ export default function DigitalTwinChat() {
       </div>
 
       {/* 常见问题快捷按钮 */}
-      <div className="px-4 pb-2 flex flex-wrap gap-2">
+      <div className="px-3 pb-1.5 flex flex-wrap gap-1.5">
         {FAQ_BUTTONS.map((faqKey) => (
           <button
             key={faqKey}
             onClick={() => handleFaqClick(faqKey)}
             disabled={isStreaming}
-            className="text-xs px-3 py-1.5 rounded-full border border-border bg-background text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors disabled:opacity-50"
+            className="text-xs px-2.5 py-1 rounded-full border border-border bg-background text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors disabled:opacity-50"
           >
             {t(locale, faqKey)}
           </button>
@@ -191,7 +201,7 @@ export default function DigitalTwinChat() {
       </div>
 
       {/* 输入框 */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border">
+      <form onSubmit={handleSubmit} className="p-3 border-t border-border">
         <div className="flex gap-2">
           <input
             type="text"
@@ -199,16 +209,16 @@ export default function DigitalTwinChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder={t(locale, 'chatPlaceholder')}
             disabled={isStreaming}
-            className="flex-1 min-w-0 px-4 py-2.5 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors disabled:opacity-50"
+            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors disabled:opacity-50"
             style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
           />
           <button
             type="submit"
             disabled={isStreaming || !input.trim()}
-            className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={t(locale, 'chatSend')}
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3.5 h-3.5" />
           </button>
         </div>
       </form>

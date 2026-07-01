@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import IntersectObserver from '@/components/common/IntersectObserver';
 import { Toaster } from '@/components/ui/sonner';
+import FloatingDiscPlayer from '@/components/FloatingDiscPlayer';
 import { I18nProvider } from '@/contexts/I18nContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
@@ -27,6 +28,11 @@ export default function App() {
             </main>
           </div>
           <Toaster />
+          <FloatingDiscPlayer
+            audioSrc="/music/you-will-be-found.mp3"
+            labelLine1="You Will"
+            labelLine2="Be Found"
+          />
         </Router>
       </ThemeProvider>
     </I18nProvider>

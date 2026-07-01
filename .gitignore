@@ -13,8 +13,22 @@ dist-ssr
 output
 *.local
 package-lock.json
+pnpm-lock.yaml
 playwright-report
 test-results
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Build cache
+.vite_cache
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Editor directories and files
 .vscode/*
@@ -29,4 +43,3 @@ test-results
 package.json.[0-9]*
 .sync
 history/*.json
-.vite_cache

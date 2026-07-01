@@ -5,6 +5,7 @@ export const translations = {
     // 开场
     welcome: '欢迎来到我的个人网页',
     clickToEnter: '点击进入',
+    splashSubtitle: 'creative developer',
     // 导航
     aboutMe: '关于我',
     chatWithMe: '和我聊聊',
@@ -23,6 +24,9 @@ export const translations = {
     recentWorkDesc: '搭自己的个人主页，整理作品集、学习 AI 的应用',
     focusAreas: '关心的方向',
     focusAreasDesc: '女性主义、内容表达、知识整理',
+    // 音乐
+    myMusic: '音乐',
+    musicDesc: '来自《致埃文·汉森》——《You Will Be Found》',
     // 聊天区
     digitalTwin: '张巧楠的数字分身',
     chatPlaceholder: '向我提问吧...',
@@ -101,10 +105,14 @@ export const translations = {
     lightMode: '日间',
     darkMode: '夜间',
     scrollToExplore: '滚动探索更多',
+    viewLive: '查看预览',
+    viewGithub: '查看源码',
+    viewAllPortfolio: '查看全部作品',
   },
   en: {
     welcome: 'Welcome to my personal page',
     clickToEnter: 'Click to enter',
+    splashSubtitle: 'creative developer',
     aboutMe: 'About Me',
     chatWithMe: 'Chat with Me',
     name: 'Zhang Qiaonan',
@@ -121,6 +129,9 @@ export const translations = {
     recentWorkDesc: 'Building my personal homepage, organizing my portfolio, and learning AI applications',
     focusAreas: 'Focus Areas',
     focusAreasDesc: 'Feminism, content expression, knowledge organization',
+    // 音乐
+    myMusic: 'Music',
+    musicDesc: 'from Dear Evan Hansen — You Will Be Found',
     digitalTwin: "Qiaonan's Digital Twin",
     chatPlaceholder: 'Ask me anything...',
     chatSend: 'Send',

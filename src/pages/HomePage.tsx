@@ -4,10 +4,12 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { t } from '@/lib/i18n';
 import {
   Sun, Moon, Sparkles, Mail, Music, BookOpen, Clapperboard, Theater,
-  Feather, Brain, Compass, GraduationCap, Building2, Award, CheckCircle2,
-  FileText, BarChart3, Package, MonitorSmartphone, Trophy
+  Feather, Brain, Compass, GraduationCap, Building2, Award,
+  BarChart3, Package, MonitorSmartphone, Trophy
 } from 'lucide-react';
 import DigitalTwinChat from '@/components/DigitalTwinChat';
+import PortfolioSection from '@/components/PortfolioSection';
+import ContactDock from '@/components/ContactDock';
 
 // ========== 组件 ==========
 
@@ -79,57 +81,6 @@ function LittlePalette({ className, style }: { className?: string; style?: React
       <circle cx="16" cy="14" r="1.5" fill="currentColor" />
       <circle cx="10" cy="16" r="1.5" fill="currentColor" />
     </svg>
-  );
-}
-
-// 时间轴节点
-interface TimelineItemProps {
-  period: string;
-  company: string;
-  role: string;
-  descriptions: string[];
-  isLast?: boolean;
-  delay?: number;
-}
-
-function TimelineItem({ period, company, role, descriptions, isLast, delay = 0 }: TimelineItemProps) {
-  return (
-    <div className="flex gap-4 md:gap-6 animate-fade-in-up" style={{ animationDelay: `${delay}ms` }}>
-      <div className="flex flex-col items-center shrink-0">
-        <div className="w-4 h-4 rounded-full border-[2.5px] border-accent bg-background z-10 mt-1.5" />
-        {!isLast && (
-          <div
-            className="w-0.5 flex-1 min-h-[40px] mt-1"
-            style={{
-              background: 'repeating-linear-gradient(to bottom, hsl(var(--border)) 0, hsl(var(--border)) 6px, transparent 6px, transparent 10px)',
-            }}
-          />
-        )}
-      </div>
-      <div className="flex-1 pb-6">
-        <div className="sketch-border bg-card border border-border p-4 md:p-5 space-y-2 transition-all duration-300 hover:border-accent/40">
-          <div className="flex items-center gap-2 text-xs font-medium text-accent">
-            <FileText className="w-3.5 h-3.5" />
-            <span>{period}</span>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-            <h3 className="text-base font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-              {company}
-            </h3>
-            <span className="hidden md:block w-1 h-1 rounded-full bg-muted-foreground" />
-            <span className="text-sm text-primary font-medium">{role}</span>
-          </div>
-          <ul className="space-y-1.5 pt-1">
-            {descriptions.map((desc, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
-                <CheckCircle2 className="w-3.5 h-3.5 text-primary/60 shrink-0 mt-0.5" />
-                <span>{desc}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -233,15 +184,20 @@ export default function HomePage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-12 space-y-12">
-        {/* 首行 CTA */}
+        {/* 首行 CTA — 聊天入口 */}
         <section className="flex flex-col items-center text-center animate-fade-in-up">
           <button
             onClick={scrollToChat}
-            className="px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="group relative px-7 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium
+                       hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
             style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
           >
-            {t(locale, 'chatWithMe')}
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
+              {t(locale, 'chatWithMe')}
+            </span>
           </button>
+          <p className="mt-2 text-xs text-muted-foreground/60">{t(locale, 'askMeAnything')}</p>
         </section>
 
         {/* 装饰分隔 */}
@@ -309,16 +265,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 装饰分隔 */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-16 h-px bg-border" />
-          <div className="w-2 h-2 rounded-full bg-accent/50" />
-          <div className="w-16 h-px bg-border" />
-        </div>
-
         {/* 教育经历 */}
-        <section className="space-y-6 animate-fade-in-up">
-          <div className="flex items-center gap-2">
+        <section className="space-y-2 animate-fade-in-up">
+          <div className="flex items-center gap-2 mb-10">
             <GraduationCap className="w-5 h-5 text-primary" />
             <h2
               className="text-lg md:text-xl font-bold text-foreground"
@@ -328,25 +277,36 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="sketch-border bg-card border border-border p-5 md:p-6 space-y-3">
-            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
-              <span className="text-sm font-medium text-accent">{t(locale, 'eduPeriod')}</span>
-              <span className="hidden md:block w-1 h-1 rounded-full bg-muted-foreground" />
-              <h3 className="text-base font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-                {t(locale, 'eduSchool')}
-              </h3>
-              <span className="hidden md:block w-1 h-1 rounded-full bg-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{t(locale, 'eduMajor')}</span>
-            </div>
-
-            <div className="pt-2 border-t border-border/60">
-              <div className="flex items-center gap-2 mb-2">
-                <BookOpen className="w-4 h-4 text-primary/70" />
-                <span className="text-sm font-medium text-foreground">{t(locale, 'eduCourse')}</span>
+          {/* 编辑风：左内容 + 右日期 */}
+          <div className="py-8 md:py-12 border-b border-border/20 last:border-0">
+            <div className="flex items-start gap-6 md:gap-12">
+              {/* 左侧：内容 */}
+              <div className="flex-1 space-y-3 min-w-0">
+                <h3
+                  className="text-base md:text-lg font-bold text-foreground"
+                  style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+                >
+                  {t(locale, 'eduSchool')}
+                </h3>
+                <p className="text-sm text-accent font-medium">{t(locale, 'eduMajor')}</p>
+                <div className="pt-2 space-y-2">
+                  <p className="text-xs text-muted-foreground/70 uppercase tracking-wider">{t(locale, 'eduCourse')}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed max-w-md">{t(locale, 'eduCourseDesc')}</p>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed pl-6">
-                {t(locale, 'eduCourseDesc')}
-              </p>
+
+              {/* 右侧：大号浅色日期锚点 */}
+              <span
+                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
+                style={{
+                  color: 'hsl(var(--border))',
+                  fontFamily: "'LXGW WenKai', 'PingFang SC', sans-serif",
+                  letterSpacing: '0.05em',
+                  lineHeight: 1,
+                }}
+              >
+                {t(locale, 'eduPeriod').split(' ')[0]}
+              </span>
             </div>
           </div>
         </section>
@@ -358,9 +318,9 @@ export default function HomePage() {
           <div className="w-16 h-px bg-border" />
         </div>
 
-        {/* 工作经历 - 时间轴 */}
-        <section className="space-y-6 animate-fade-in-up">
-          <div className="flex items-center gap-2">
+        {/* 工作经历 - 编辑风时间线 */}
+        <section className="space-y-2 animate-fade-in-up">
+          <div className="flex items-center gap-2 mb-10">
             <Building2 className="w-5 h-5 text-primary" />
             <h2
               className="text-lg md:text-xl font-bold text-foreground"
@@ -370,29 +330,79 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="pl-1">
-            <TimelineItem
-              period={t(locale, 'work1Period')}
-              company={t(locale, 'work1Company')}
-              role={t(locale, 'work1Role')}
-              descriptions={[t(locale, 'work1Desc1'), t(locale, 'work1Desc2'), t(locale, 'work1Desc3')]}
-              delay={100}
-            />
-            <TimelineItem
-              period={t(locale, 'work2Period')}
-              company={t(locale, 'work2Company')}
-              role={t(locale, 'work2Role')}
-              descriptions={[t(locale, 'work2Desc1'), t(locale, 'work2Desc2')]}
-              delay={300}
-            />
-            <TimelineItem
-              period={t(locale, 'work3Period')}
-              company={t(locale, 'work3Company')}
-              role={t(locale, 'work3Role')}
-              descriptions={[t(locale, 'work3Desc1'), t(locale, 'work3Desc2'), t(locale, 'work3Desc3')]}
-              isLast
-              delay={500}
-            />
+          {/* === 工作经历 1 === */}
+          <div className="py-8 md:py-12 border-b border-border/20">
+            <div className="flex items-start gap-6 md:gap-12">
+              <div className="flex-1 space-y-3 min-w-0">
+                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
+                  {t(locale, 'work1Company')}
+                </h3>
+                <p className="text-sm text-accent font-medium">{t(locale, 'work1Role')}</p>
+                <ul className="pt-2 space-y-2">
+                  {[t(locale, 'work1Desc1'), t(locale, 'work1Desc2'), t(locale, 'work1Desc3')].map((desc, idx) => (
+                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
+                      {desc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <span
+                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
+                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
+              >
+                {t(locale, 'work1Period').split(' ')[0]}
+              </span>
+            </div>
+          </div>
+
+          {/* === 工作经历 2 === */}
+          <div className="py-8 md:py-12 border-b border-border/20">
+            <div className="flex items-start gap-6 md:gap-12">
+              <div className="flex-1 space-y-3 min-w-0">
+                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
+                  {t(locale, 'work2Company')}
+                </h3>
+                <p className="text-sm text-accent font-medium">{t(locale, 'work2Role')}</p>
+                <ul className="pt-2 space-y-2">
+                  {[t(locale, 'work2Desc1'), t(locale, 'work2Desc2')].map((desc, idx) => (
+                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
+                      {desc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <span
+                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
+                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
+              >
+                {t(locale, 'work2Period').split(' ')[0]}
+              </span>
+            </div>
+          </div>
+
+          {/* === 工作经历 3 === */}
+          <div className="py-8 md:py-12">
+            <div className="flex items-start gap-6 md:gap-12">
+              <div className="flex-1 space-y-3 min-w-0">
+                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
+                  {t(locale, 'work3Company')}
+                </h3>
+                <p className="text-sm text-accent font-medium">{t(locale, 'work3Role')}</p>
+                <ul className="pt-2 space-y-2">
+                  {[t(locale, 'work3Desc1'), t(locale, 'work3Desc2'), t(locale, 'work3Desc3')].map((desc, idx) => (
+                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
+                      {desc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <span
+                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
+                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
+              >
+                {t(locale, 'work3Period').split(' ')[0]}
+              </span>
+            </div>
           </div>
         </section>
 
@@ -403,7 +413,10 @@ export default function HomePage() {
           <div className="w-16 h-px bg-border" />
         </div>
 
-        {/* 技能与奖项 */}
+        {/* 作品集 */}
+        <PortfolioSection />
+
+        {/* 装饰分隔 */}
         <section className="space-y-6 animate-fade-in-up">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-primary" />
@@ -472,6 +485,9 @@ export default function HomePage() {
           </p>
         </div>
       </footer>
+
+      {/* 联系方式悬浮栏 */}
+      <ContactDock />
     </div>
   );
 }
