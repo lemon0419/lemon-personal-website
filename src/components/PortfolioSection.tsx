@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { t } from '@/lib/i18n';
-import { ExternalLink, ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer } from 'lucide-react';
 
 // ========== 数据 ==========
 
@@ -200,6 +200,46 @@ function PrototypeCard({ locale }: { locale: 'zh' | 'en' }) {
   );
 }
 
+/* 番茄钟卡片 */
+function PomodoroCard({ locale }: { locale: 'zh' | 'en' }) {
+  return (
+    <a
+      href="/works/pomodoro.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative w-full h-full min-h-[220px] bg-card border border-border rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-300 flex flex-col"
+    >
+      {/* 上部：视觉区域 */}
+      <div className="relative flex-1 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-4 flex items-center justify-center overflow-hidden">
+        {/* 装饰性 SVG：番茄 */}
+        <svg viewBox="0 0 120 120" className="w-20 h-20 text-red-500/20" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="65" r="40" fill="none" stroke="currentColor" strokeWidth="3" />
+          <path d="M60 25 L60 40 M45 30 L52 42 M75 30 L68 42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <ellipse cx="60" cy="65" rx="35" ry="38" fill="currentColor" opacity="0.1" />
+        </svg>
+
+        {/* 类型标签 */}
+        <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/60 text-[10px] font-medium text-muted-foreground">
+          <Timer className="w-3 h-3" />
+          <span>{t(locale, 'webProject')}</span>
+        </div>
+      </div>
+
+      {/* 下部：信息 */}
+      <div className="p-3 space-y-1.5">
+        <h4 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+          {t(locale, 'project3')}
+        </h4>
+        <p className="text-[10px] text-muted-foreground">{t(locale, 'project3Desc')}</p>
+        <div className="flex items-center gap-1 pt-0.5 text-xs font-medium text-primary group-hover:text-accent transition-colors">
+          <span>{t(locale, 'viewProject')}</span>
+          <ArrowUpRight className="w-3 h-3" />
+        </div>
+      </div>
+    </a>
+  );
+}
+
 /* 推文小卡片 */
 function ArticleCard({ article, locale }: { article: typeof ARTICLES[0]; locale: 'zh' | 'en' }) {
   return (
@@ -250,14 +290,17 @@ export default function PortfolioSection() {
           {t(locale, 'projectSection')}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* 左：数独轮播 */}
           <div className="group">
             <MiniSudokuCarousel />
           </div>
 
-          {/* 右：人物原型学习站 */}
+          {/* 中：人物原型学习站 */}
           <PrototypeCard locale={locale} />
+
+          {/* 右：番茄钟 */}
+          <PomodoroCard locale={locale} />
         </div>
       </div>
 

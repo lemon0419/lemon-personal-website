@@ -4,7 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { t } from '@/lib/i18n';
 import {
   Sun, Moon, Sparkles, ArrowLeft, ExternalLink, MessageSquareText,
-  Gamepad2, Library
+  Gamepad2, Library, Timer
 } from 'lucide-react';
 
 const PROJECTS = [
@@ -22,6 +22,14 @@ const PROJECTS = [
     url: '/works/prototypes.html',
     color: 'hsl(210 25% 92%)',
     icon: Library,
+    typeLabel: 'webProject',
+  },
+  {
+    id: 'project3',
+    descId: 'project3Desc',
+    url: '/works/pomodoro.html',
+    color: 'hsl(0 60% 90%)',
+    icon: Timer,
     typeLabel: 'webProject',
   },
 ];
@@ -205,7 +213,7 @@ export default function PortfolioPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {PROJECTS.map((project, index) => (
               <WorkCard
                 key={project.id}
