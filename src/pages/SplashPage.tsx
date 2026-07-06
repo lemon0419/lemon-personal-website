@@ -407,23 +407,24 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
       <FloatingDecorations />
 
       {/* 人物形象 — 融入 mesh gradient 背景 */}
-      <div className="absolute inset-0 z-[5] flex items-end justify-center pointer-events-none">
+      <div className="absolute inset-0 z-[3] flex items-center justify-center pointer-events-none">
         <div
           className={`relative transition-all duration-700 ease-out ${
-            isAnimating ? 'opacity-0 scale-90 translate-y-[40px]' : 'opacity-100'
+            isAnimating ? 'opacity-0 scale-90' : 'opacity-100'
           }`}
           style={{ animationDuration: '6s' }}
         >
           <img
             src="/images/character/一位年轻的中国女性_黑色长发_戴圆框眼镜_穿浅色衬衫_简约水_2026-07-06T09-09-52.png"
             alt="Portrait"
-            className="w-[260px] h-auto md:w-[360px] object-contain"
+            className="w-[200px] h-auto md:w-[280px] object-contain"
             style={{
-              maskImage: 'linear-gradient(to top, transparent 0%, black 25%, black 75%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 25%, black 75%, transparent 100%)',
+              maskImage: 'radial-gradient(ellipse 65% 55% at 50% 40%, black 25%, transparent 75%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 65% 55% at 50% 40%, black 25%, transparent 75%)',
               filter: 'drop-shadow(0 8px 32px hsl(var(--foreground) / 0.06))',
               mixBlendMode: 'multiply',
-              opacity: 0.55,
+              opacity: 0.35,
+              transform: 'translateY(55px)',
             }}
           />
         </div>

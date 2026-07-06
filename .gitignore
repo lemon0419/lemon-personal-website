@@ -43,3 +43,6 @@ Thumbs.db
 package.json.[0-9]*
 .sync
 history/*.json
+
+.vercel
+.env*
