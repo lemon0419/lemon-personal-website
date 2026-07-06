@@ -1,28 +1,30 @@
 /* stylelint-disable */
 @import url('https://chinese-font.netlify.app/packages/lxgwwenkai/dist/LXGWWenKai-Regular/result.css');
 @import url('https://chinese-font.netlify.app/packages/lxgwwenkai/dist/LXGWWenKai-Bold/result.css');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
-All colors MUST be HSL.
-*/
+/*
+ *  Design System — Ardot-inspired
+ *  All colors in HSL. No pure black. Single accent, muted palette.
+ */
 
 @layer base {
   :root {
     --radius: 0.75rem;
     --background: 37 24% 94%;
-    --foreground: 0 0% 24%;
+    --foreground: 0 0% 22%;
     --card: 37 20% 96%;
-    --card-foreground: 0 0% 24%;
+    --card-foreground: 0 0% 22%;
     --popover: 37 20% 96%;
-    --popover-foreground: 0 0% 24%;
+    --popover-foreground: 0 0% 22%;
     --primary: 90 10% 67%;
     --primary-foreground: 0 0% 100%;
     --secondary: 30 18% 83%;
-    --secondary-foreground: 0 0% 24%;
+    --secondary-foreground: 0 0% 22%;
     --muted: 34 13% 87%;
     --muted-foreground: 0 0% 45%;
     --accent: 30 35% 65%;
@@ -31,55 +33,79 @@ All colors MUST be HSL.
     --border: 34 13% 81%;
     --input: 34 13% 87%;
     --ring: 90 10% 67%;
+    --surface-elevated: 37 22% 97%;
+    --surface-dim: 34 18% 91%;
     --chart-1: 90 10% 67%;
     --chart-2: 30 35% 65%;
     --chart-3: 34 13% 81%;
     --chart-4: 37 24% 94%;
     --chart-5: 0 0% 45%;
     --sidebar-background: 37 20% 96%;
-    --sidebar-foreground: 0 0% 24%;
+    --sidebar-foreground: 0 0% 22%;
     --sidebar-primary: 90 10% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 34 13% 87%;
-    --sidebar-accent-foreground: 0 0% 24%;
+    --sidebar-accent-foreground: 0 0% 22%;
     --sidebar-border: 34 13% 81%;
     --sidebar-ring: 90 10% 67%;
     --destructive-foreground: 0 0% 100%;
+    --success: 142 40% 45%;
+    --warning: 38 48% 48%;
+    --info: 200 45% 48%;
+    --education-blue: 210 40% 55%;
+    --education-green: 160 35% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(var(--surface-dim)));
+    --gradient-background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--surface-dim)));
+    --shadow-card: 0 1px 2px hsl(var(--foreground) / 0.04), 0 4px 16px hsl(var(--foreground) / 0.04);
+    --shadow-hover: 0 2px 4px hsl(var(--foreground) / 0.05), 0 8px 24px hsl(var(--primary) / 0.06);
   }
 
   .dark {
-    --background: 0 0% 18%;
-    --foreground: 37 15% 88%;
-    --card: 0 0% 22%;
-    --card-foreground: 37 15% 88%;
-    --popover: 0 0% 22%;
-    --popover-foreground: 37 15% 88%;
-    --primary: 90 10% 67%;
+    --background: 0 0% 14%;
+    --foreground: 37 15% 85%;
+    --card: 0 0% 18%;
+    --card-foreground: 37 15% 85%;
+    --popover: 0 0% 18%;
+    --popover-foreground: 37 15% 85%;
+    --primary: 90 10% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 28%;
-    --secondary-foreground: 37 15% 88%;
-    --muted: 0 0% 28%;
-    --muted-foreground: 37 10% 60%;
-    --accent: 30 35% 55%;
+    --secondary: 0 0% 24%;
+    --secondary-foreground: 37 15% 85%;
+    --muted: 0 0% 24%;
+    --muted-foreground: 37 10% 55%;
+    --accent: 30 35% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 50% 45%;
-    --border: 0 0% 32%;
-    --input: 0 0% 28%;
-    --ring: 90 10% 67%;
-    --chart-1: 90 10% 67%;
-    --chart-2: 30 35% 55%;
-    --chart-3: 0 0% 32%;
-    --chart-4: 0 0% 18%;
-    --chart-5: 37 10% 60%;
-    --sidebar-background: 0 0% 22%;
-    --sidebar-foreground: 37 15% 88%;
-    --sidebar-primary: 90 10% 67%;
+    --border: 0 0% 28%;
+    --input: 0 0% 24%;
+    --ring: 90 10% 62%;
+    --surface-elevated: 0 0% 20%;
+    --surface-dim: 0 0% 12%;
+    --chart-1: 90 10% 62%;
+    --chart-2: 30 35% 50%;
+    --chart-3: 0 0% 28%;
+    --chart-4: 0 0% 14%;
+    --chart-5: 37 10% 55%;
+    --sidebar-background: 0 0% 18%;
+    --sidebar-foreground: 37 15% 85%;
+    --sidebar-primary: 90 10% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 28%;
-    --sidebar-accent-foreground: 37 15% 88%;
-    --sidebar-border: 0 0% 32%;
-    --sidebar-ring: 90 10% 67%;
+    --sidebar-accent: 0 0% 24%;
+    --sidebar-accent-foreground: 37 15% 85%;
+    --sidebar-border: 0 0% 28%;
+    --sidebar-ring: 90 10% 62%;
     --destructive-foreground: 0 0% 100%;
+    --success: 142 50% 42%;
+    --warning: 38 55% 45%;
+    --info: 200 50% 45%;
+    --education-blue: 210 45% 50%;
+    --education-green: 160 40% 45%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    --gradient-card: linear-gradient(180deg, hsl(var(--card)), hsl(var(--surface-dim)));
+    --gradient-background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--surface-dim)));
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.1), 0 4px 16px hsl(0 0% 0% / 0.1);
+    --shadow-hover: 0 2px 4px hsl(0 0% 0% / 0.12), 0 8px 24px hsl(var(--primary) / 0.08);
   }
 }
 
@@ -94,35 +120,71 @@ All colors MUST be HSL.
   }
 }
 
-/* 手绘风格边框 */
-.sketch-border {
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-}
-
-/* 幕布拉开动画 */
-@keyframes curtain-open-left {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-@keyframes curtain-open-right {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(100%); }
-}
+/* =====================================================
+ *  CORE ANIMATIONS — Ardot-inspired motion design
+ *  MOTION_INTENSITY: 6 (fluid, staggered, scroll-aware)
+ *  Easing: cubic-bezier(0.4, 0, 0.2, 1) — Material standard
+ * ===================================================== */
 
 @keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(20px); }
+  0%   { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-right {
+  0%   { opacity: 0; transform: translateX(-14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-in-left {
+  0%   { opacity: 0; transform: translateX(14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-in-scale {
+  0%   { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes float-gentle {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes float-rotate {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-5px) rotate(1.5deg); }
 }
 
 @keyframes bounce-soft {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50%      { transform: scale(1.04); }
+}
+
+@keyframes reveal-line {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes breath {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.05); }
+}
+
+/* Curtain reveal */
+@keyframes curtain-open-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes curtain-open-right {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(100%); }
 }
 
 .animate-curtain-left {
@@ -134,18 +196,208 @@ All colors MUST be HSL.
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.8s ease-out forwards;
+  animation: fade-in-up 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-right {
+  animation: fade-in-right 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-left {
+  animation: fade-in-left 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-float {
-  animation: float-gentle 3s ease-in-out infinite;
+  animation: float-gentle 3.5s ease-in-out infinite;
+}
+
+.animate-float-rotate {
+  animation: float-rotate 4s ease-in-out infinite;
 }
 
 .animate-bounce-soft {
-  animation: bounce-soft 2s ease-in-out infinite;
+  animation: bounce-soft 2.5s ease-in-out infinite;
 }
 
-/* 聊天气泡手绘风格 */
+.animate-reveal-line {
+  animation: reveal-line 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: left;
+}
+
+.animate-breath {
+  animation: breath 2.5s ease-in-out infinite;
+}
+
+/* Staggered reveal — use with inline animation-delay */
+.animate-stagger {
+  opacity: 0;
+  animation: fade-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* =====================================================
+ *  SCROLL REVEAL — Intersection Observer driven
+ * ===================================================== */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =====================================================
+ *  IMAGE TREATMENT — Edge-fade dissolve, no hard borders
+ *  All images have white/gray backgrounds; mask-image lets
+ *  them dissolve into the page background naturally.
+ * ===================================================== */
+
+/* =====================================================
+ *  Ardot: "When glassmorphism is needed, go beyond simple blur.
+ *  Add a 1px inner border (white ~10% opacity) and subtle inner
+ *  shadow to simulate physical edge refraction."
+ * ===================================================== */
+
+/* Diffusion shadow: wide, light, tinted to background hue — no harsh drop shadows */
+.diffusion-shadow {
+  box-shadow:
+    0 1px 2px hsl(var(--foreground) / 0.03),
+    0 4px 12px hsl(var(--foreground) / 0.04),
+    0 12px 32px hsl(var(--foreground) / 0.025);
+}
+
+/* Elevated card — true glass refraction with inner border */
+.elevated-card {
+  position: relative;
+  background: hsl(var(--surface-elevated));
+  border: 1px solid hsl(var(--border) / 0.5);
+  /* Inner border simulates physical edge refraction (Ardot Liquid Glass) */
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.06),
+    0 1px 2px hsl(var(--foreground) / 0.03),
+    0 4px 12px hsl(var(--foreground) / 0.04);
+  transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s ease;
+}
+
+.elevated-card:hover {
+  border-color: hsl(var(--primary) / 0.2);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.08),
+    0 2px 4px hsl(var(--foreground) / 0.04),
+    0 8px 24px hsl(var(--primary) / 0.06),
+    0 16px 48px hsl(var(--foreground) / 0.03);
+  transform: translateY(-3px);
+}
+
+/* Liquid Glass Panel — frosted glass with true refraction */
+.liquid-glass {
+  position: relative;
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid hsl(var(--border) / 0.4);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.1),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.03),
+    0 4px 16px hsl(var(--foreground) / 0.05);
+}
+
+.liquid-glass:hover {
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.12),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.03),
+    0 8px 32px hsl(var(--foreground) / 0.06);
+}
+
+/* Bento Card — large radius, generous padding, diffusion shadow */
+.bento-card {
+  position: relative;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 0.5);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.05),
+    0 1px 2px hsl(var(--foreground) / 0.03),
+    0 4px 16px hsl(var(--foreground) / 0.03);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  border-color: hsl(var(--primary) / 0.15);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.07),
+    0 4px 12px hsl(var(--foreground) / 0.04),
+    0 12px 40px hsl(var(--primary) / 0.05);
+  transform: translateY(-2px);
+}
+
+/* =====================================================
+ *  BENTO GRID — Asymmetric tiled layout
+ *  Ardot: "Large rounded corners (~2.5rem), generous padding
+ *  (32-40px), diffusion shadow, high-end minimal functional"
+ * ===================================================== */
+
+.bento-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    /* Asymmetric fractional grid — Ardot DESIGN_VARIANCE: 8 */
+    grid-template-columns: 1.4fr 0.6fr 1fr;
+    grid-auto-rows: minmax(180px, auto);
+  }
+}
+
+.bento-tall {
+  @media (min-width: 768px) {
+    grid-row: span 2;
+  }
+}
+
+.bento-wide {
+  @media (min-width: 768px) {
+    grid-column: span 2;
+  }
+}
+
+.bento-full {
+  @media (min-width: 768px) {
+    grid-column: span 3;
+  }
+}
+
+/* =====================================================
+ *  HAND-DRAWN / SKETCH STYLE
+ * ===================================================== */
+
+/* Irregular sketch border — more organic variation */
+.sketch-border {
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+
+.sketch-border-alt {
+  border-radius: 15px 255px 15px 225px / 225px 15px 255px 15px;
+}
+
+.sketch-border-subtle {
+  border-radius: 180px 20px 160px 20px / 20px 180px 20px 160px;
+}
+
+/* Chat bubbles */
 .chat-bubble-left {
   border-radius: 20px 20px 20px 4px;
 }
@@ -154,7 +406,203 @@ All colors MUST be HSL.
   border-radius: 20px 20px 4px 20px;
 }
 
-/* 自定义滚动条 */
+/* =====================================================
+ *  SPOTLIGHT BORDER — Border glow follows cursor
+ *  Ardot: "Spotlight Border Card — borders illuminating
+ *  dynamically under cursor"
+ * ===================================================== */
+
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Inner glow that follows cursor */
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    hsl(var(--primary) / 0.07),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Border glow that follows cursor — uses mask to show only on border */
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    hsl(var(--accent) / 0.4),
+    transparent 50%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.spotlight-card:hover::before,
+.spotlight-card:hover::after {
+  opacity: 1;
+}
+
+/* =====================================================
+ *  MESH GRADIENT — Organic, lava-lamp-like animated background
+ *  Ardot: "Mesh Gradient Background — organic, animated color blobs"
+ * ===================================================== */
+
+.mesh-gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.4;
+  pointer-events: none;
+  background:
+    radial-gradient(at 20% 30%, hsl(var(--accent) / 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 20%, hsl(var(--primary) / 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, hsl(var(--accent) / 0.05) 0px, transparent 50%),
+    radial-gradient(at 90% 70%, hsl(var(--primary) / 0.04) 0px, transparent 50%);
+  animation: mesh-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes mesh-drift {
+  0%   { transform: scale(1) rotate(0deg); }
+  50%  { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(0.95) rotate(-1deg); }
+}
+
+/* =====================================================
+ *  SKELETON SHIMMER — Shifting light reflections
+ *  Ardot: "Skeleton Shimmer — shifting light reflections"
+ * ===================================================== */
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: hsl(var(--muted) / 0.5);
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(0 0% 100% / 0.15),
+    transparent
+  );
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* =====================================================
+ *  MAGNETIC BUTTON — Subtle pull toward cursor
+ *  Ardot: "Magnetic Button — buttons that pull toward the cursor"
+ * ===================================================== */
+
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.magnetic-btn:hover {
+  transform: translate(var(--magnetic-x, 0px), var(--magnetic-y, 0px));
+}
+
+/* =====================================================
+ *  DIRECTIONAL HOVER — Fill enters from mouse entry side
+ *  Ardot: "Directional Hover Aware Button"
+ * ===================================================== */
+
+.directional-hover {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.directional-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--primary) / 0.08);
+  transform: var(--hover-direction, scaleX(0));
+  transform-origin: var(--hover-origin, left);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.directional-hover:hover::before {
+  transform: scaleX(1) scaleY(1);
+}
+
+/* =====================================================
+ *  TYPOGRAPHY UTILITIES
+ * ===================================================== */
+
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+.font-wenkai {
+  font-family: 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* =====================================================
+ *  SECTION DIVIDER — Creative line treatments
+ * ===================================================== */
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0.4;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(
+    to right,
+    transparent,
+    hsl(var(--border)),
+    transparent
+  );
+}
+
+.section-divider-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: hsl(var(--accent));
+  flex-shrink: 0;
+}
+
+/* =====================================================
+ *  SCROLLBAR
+ * ===================================================== */
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }

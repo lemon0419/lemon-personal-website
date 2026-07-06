@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { t } from '@/lib/i18n';
 import { sendStreamRequest } from '@/lib/sse';
-import { Send, User, Bot, Sparkles } from 'lucide-react';
+import { Send, User, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -44,16 +44,24 @@ function ChatBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
 
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} animate-fade-in-up`} style={{ animationDuration: '0.4s' }}>
       {/* 头像 */}
       <div
-        className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser
-            ? 'bg-primary/15 text-primary'
-            : 'bg-accent/15 text-accent'
-        }`}
+        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+        style={isUser
+          ? { background: 'hsl(var(--primary) / 0.15)', color: 'hsl(var(--primary))' }
+          : { background: 'hsl(var(--accent) / 0.12)' }
+        }
       >
-        {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+        {isUser ? (
+          <User className="w-4 h-4" />
+        ) : (
+          <img
+            src="/images/character/chat-avatar.png"
+            alt="ZQN"
+            className="w-5 h-5 object-cover"
+          />
+        )}
       </div>
 
       {/* 气泡 */}
@@ -61,10 +69,28 @@ function ChatBubble({ message }: { message: Message }) {
         className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed ${
           isUser
             ? 'chat-bubble-right bg-primary text-primary-foreground'
-            : 'chat-bubble-left bg-card border border-border text-foreground'
+            : 'chat-bubble-left liquid-glass text-foreground'
         }`}
       >
         {message.content}
+      </div>
+    </div>
+  );
+}
+
+// Skeleton 闪烁加载状态
+function ThinkingBubble() {
+  return (
+    <div className="flex gap-3 animate-fade-in-up" style={{ animationDuration: '0.4s' }}>
+      <div className="shrink-0 w-8 h-8 rounded-full bg-accent/15 text-accent flex items-center justify-center">
+        <Sparkles className="w-4 h-4 animate-breath" />
+      </div>
+      <div className="chat-bubble-left liquid-glass px-4 py-3 text-sm text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-breath" style={{ animationDelay: '0s' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-breath" style={{ animationDelay: '0.2s' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-breath" style={{ animationDelay: '0.4s' }} />
+        </div>
       </div>
     </div>
   );
@@ -165,35 +191,29 @@ export default function DigitalTwinChat() {
   };
 
   return (
-    <div className="sketch-border border border-border bg-card overflow-hidden">
+    <div className="liquid-glass sketch-border overflow-hidden">
       {/* 聊天记录区 */}
       <div
         ref={scrollRef}
-        className="h-56 md:h-72 overflow-y-auto custom-scrollbar p-3 space-y-3"
+        className="h-56 md:h-72 overflow-y-auto custom-scrollbar p-4 space-y-3"
       >
         {messages.map((msg, index) => (
           <ChatBubble key={index} message={msg} />
         ))}
         {isStreaming && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content && (
-          <div className="flex gap-3">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-accent/15 text-accent flex items-center justify-center">
-              <Sparkles className="w-4 h-4 animate-spin" />
-            </div>
-            <div className="chat-bubble-left bg-card border border-border px-4 py-2.5 text-sm text-muted-foreground">
-              {t(locale, 'thinking')}
-            </div>
-          </div>
+          <ThinkingBubble />
         )}
       </div>
 
       {/* 常见问题快捷按钮 */}
-      <div className="px-3 pb-1.5 flex flex-wrap gap-1.5">
+      <div className="px-4 pb-2 flex flex-wrap gap-1.5">
         {FAQ_BUTTONS.map((faqKey) => (
           <button
             key={faqKey}
             onClick={() => handleFaqClick(faqKey)}
             disabled={isStreaming}
-            className="text-xs px-2.5 py-1 rounded-full border border-border bg-background text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors disabled:opacity-50"
+            className="text-xs px-2.5 py-1 rounded-full border border-border/60 bg-background/50 text-muted-foreground
+                       hover:border-accent/50 hover:text-accent transition-all duration-200 disabled:opacity-50"
           >
             {t(locale, faqKey)}
           </button>
@@ -201,7 +221,7 @@ export default function DigitalTwinChat() {
       </div>
 
       {/* 输入框 */}
-      <form onSubmit={handleSubmit} className="p-3 border-t border-border">
+      <form onSubmit={handleSubmit} className="p-3 border-t border-border/40">
         <div className="flex gap-2">
           <input
             type="text"
@@ -209,13 +229,16 @@ export default function DigitalTwinChat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder={t(locale, 'chatPlaceholder')}
             disabled={isStreaming}
-            className="flex-1 min-w-0 px-3 py-2 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-colors disabled:opacity-50"
+            className="flex-1 min-w-0 px-4 py-2 text-sm rounded-full border border-border/60 bg-background/60 text-foreground
+                       placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20
+                       transition-all duration-200 disabled:opacity-50"
             style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
           />
           <button
             type="submit"
             disabled={isStreaming || !input.trim()}
-            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-primary text-primary-foreground
+                       hover:bg-primary/90 hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={t(locale, 'chatSend')}
           >
             <Send className="w-3.5 h-3.5" />

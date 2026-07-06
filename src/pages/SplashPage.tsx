@@ -355,6 +355,22 @@ function CeilingLines() {
   );
 }
 
+// ====== 网格背景（参考 SimonAking 风格） ======
+function GridBackground() {
+  return (
+    <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
+      <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      </svg>
+    </div>
+  );
+}
+
 export default function SplashPage({ onEnter }: SplashPageProps) {
   const { locale } = useI18n();
   const [isAnimating, setIsAnimating] = useState(false);
@@ -370,13 +386,19 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-background overflow-hidden cursor-pointer transition-colors duration-700 ${
-        isAnimating ? 'bg-transparent' : ''
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden cursor-pointer transition-all duration-700 ${
+        isAnimating ? 'bg-transparent' : 'bg-background'
       }`}
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Mesh Gradient 背景 — 与主页一致 */}
+      <div className="mesh-gradient-bg" />
+
+      {/* 网格背景 — SimonAking 风格 */}
+      <GridBackground />
+
       {/* 透视线背景 */}
       <PerspectiveFloor />
       <CeilingLines />
@@ -384,7 +406,28 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
       {/* 浮动装饰物 */}
       <FloatingDecorations />
 
-      {/* 主内容区 */}
+      {/* 人物形象 — 融入 mesh gradient 背景 */}
+      <div className="absolute inset-0 z-[5] flex items-end justify-center pointer-events-none">
+        <div
+          className={`relative transition-all duration-700 ease-out ${
+            isAnimating ? 'opacity-0 scale-90 translate-y-[40px]' : 'opacity-100'
+          }`}
+          style={{ animationDuration: '6s' }}
+        >
+          <img
+            src="/images/character/一位年轻的中国女性_黑色长发_戴圆框眼镜_穿浅色衬衫_简约水_2026-07-06T09-09-52.png"
+            alt="Portrait"
+            className="w-[260px] h-auto md:w-[360px] object-contain"
+            style={{
+              maskImage: 'linear-gradient(to top, transparent 0%, black 25%, black 75%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 25%, black 75%, transparent 100%)',
+              filter: 'drop-shadow(0 8px 32px hsl(var(--foreground) / 0.06))',
+              mixBlendMode: 'multiply',
+              opacity: 0.55,
+            }}
+          />
+        </div>
+      </div>
       <div
         className={`relative z-10 flex flex-col items-center gap-4 md:gap-6 transition-all duration-700 ease-out ${
           isAnimating
@@ -397,37 +440,50 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
           <SketchTitle>ZQN</SketchTitle>
         </div>
 
-        {/* 副标题 */}
+        {/* 副标题 — 代码风 */}
         <p
           className="text-sm md:text-base text-muted-foreground tracking-wider font-mono"
           style={{
             fontFamily: "'Courier New', monospace",
             opacity: hovered ? 1 : 0.75,
-            transition: 'opacity 0.3s ease',
+            transition: 'opacity 0.35s ease',
           }}
         >
           &lt; {t(locale, 'splashSubtitle')} /&gt;
         </p>
 
-        {/* 人物插图 */}
-        <div className="mt-2 md:mt-4 animate-character-float">
-          <SketchCharacter />
-        </div>
-
-        {/* 进入提示 */}
         <div
-          className="mt-3 md:mt-5 text-xs text-muted-foreground/60 font-mono tracking-wider animate-hint-bounce"
+          className="mt-3 md:mt-5 text-xs text-muted-foreground/50 font-mono tracking-wider animate-hint-bounce"
           style={{ fontFamily: "'Courier New', monospace" }}
         >
           [ {t(locale, 'clickToEnter')} ]
         </div>
+
+        {/* 底部导航预览 — SimonAking 风格 */}
+        <div className="mt-8 md:mt-12 flex items-center gap-6 md:gap-8 opacity-50">
+          {[
+            { label: 'About', icon: '◎' },
+            { label: 'Works', icon: '◈' },
+            { label: 'Blog', icon: '✎' },
+            { label: 'Contact', icon: '✉' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex flex-col items-center gap-1.5 text-muted-foreground/60 hover:text-foreground/80 transition-colors duration-300"
+            >
+              <span className="text-xs font-light">{item.icon}</span>
+              <span className="text-[10px] tracking-wider uppercase font-outfit">{item.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* 退出动画遮罩层 - 从中心扩散变白再透明 */}
+      {/* 退出动画遮罩层 — 从中心光晕扩散 */}
       {isAnimating && (
         <div
-          className="absolute inset-0 z-20 bg-background"
+          className="absolute inset-0 z-20"
           style={{
+            background: 'radial-gradient(circle at 50% 50%, hsl(var(--primary)/0.08), hsl(var(--background)))',
             animation: 'splash-exit 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
           }}
         />
@@ -437,7 +493,7 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
       <style>{`
         @keyframes deco-float {
           0%   { transform: translateY(0px) rotate(0deg); }
-          100% { transform: translateY(-6px) rotate(3deg); }
+          100% { transform: translateY(-8px) rotate(3deg); }
         }
         @keyframes sketch-enter {
           0%   { opacity: 0; transform: translateY(20px); filter: blur(4px); }
@@ -450,22 +506,22 @@ export default function SplashPage({ onEnter }: SplashPageProps) {
         }
         @keyframes character-float {
           0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-8px); }
+          50%      { transform: translateY(-12px); }
         }
         .animate-character-float {
-          animation: character-float 3.5s ease-in-out infinite;
+          animation: character-float 6s ease-in-out infinite;
         }
         @keyframes hint-bounce {
-          0%, 100% { opacity: 0.5; transform: translateY(0); }
-          50%      { opacity: 1;   transform: translateY(-3px); }
+          0%, 100% { opacity: 0.4; transform: translateY(0); }
+          50%      { opacity: 0.8; transform: translateY(-4px); }
         }
         .animate-hint-bounce {
-          animation: hint-bounce 2.5s ease-in-out infinite;
-          animation-delay: 1s;
+          animation: hint-bounce 3s ease-in-out infinite;
+          animation-delay: 1.2s;
         }
         @keyframes splash-exit {
-          0%   { clip-path: circle(0% at 50% 50%); }
-          30%  { clip-path: circle(70% at 50% 50%); }
+          0%   { clip-path: circle(0% at 50% 50%); opacity: 0; }
+          25%  { clip-path: circle(60% at 50% 50%); opacity: 1; }
           100% { clip-path: circle(140% at 50% 50%); opacity: 0; }
         }
       `}</style>

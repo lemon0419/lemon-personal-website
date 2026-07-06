@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, QrCode, BookOpen, MessageCircle } from 'lucide-react';
+import { useSpotlight, useMagnetic } from '@/hooks/useSpotlight';
 
 // 联系方式数据
 const CONTACTS = [
@@ -23,6 +24,7 @@ const CONTACTS = [
 
 export default function ContactDock() {
   const [showQr, setShowQr] = useState(false);
+  const chatBtnRef = useMagnetic<HTMLButtonElement>(0.35);
 
   const scrollToChat = () => {
     const chatSection = document.querySelector('section:has(> div > h2)');
@@ -31,17 +33,18 @@ export default function ContactDock() {
 
   return (
     <>
-      {/* 固定在右下角的快捷聊天按钮 */}
+      {/* 固定在右下角的快捷聊天按钮 — 磁性效果 */}
       <button
+        ref={chatBtnRef}
         onClick={scrollToChat}
-        className="fixed right-4 bottom-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg
-                   flex items-center justify-center hover:scale-110 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 animate-fade-in-up"
+        className="magnetic-btn fixed right-4 bottom-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground diffusion-shadow
+                   flex items-center justify-center hover:scale-110 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
         title="和我聊聊"
       >
         <MessageCircle className="w-5 h-5" />
       </button>
 
-      {/* 固定在左下角的联系栏 */}
+      {/* 固定在左下角的联系栏 — Liquid Glass */}
       <div className="fixed left-4 bottom-4 z-50 flex items-end gap-2.5">
         {/* 联系方式图标 */}
         <div className="flex flex-col gap-2">
@@ -51,15 +54,15 @@ export default function ContactDock() {
               href={contact.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative w-10 h-10 rounded-full bg-card border border-border/60 shadow-md flex items-center justify-center
-                         hover:scale-110 hover:border-primary/40 transition-all duration-200 hover:-translate-y-1"
+              className="group relative w-10 h-10 rounded-full liquid-glass flex items-center justify-center
+                         hover:scale-110 hover:-translate-y-1 transition-all duration-300"
               title={`${contact.label}: ${contact.value}`}
             >
               <contact.icon className="w-[18px] h-[18px]" style={{ color: contact.color }} />
 
               {/* 悬浮提示 */}
               <span className="absolute left-full ml-2.5 px-2.5 py-1 rounded-md bg-foreground text-background text-xs font-medium
-                               opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity duration-200
+                               opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all duration-200
                                -translate-x-1 group-hover:translate-x-0">
                 {contact.value}
               </span>
@@ -69,13 +72,13 @@ export default function ContactDock() {
           {/* 微信二维码按钮 */}
           <button
             onClick={() => setShowQr(!showQr)}
-            className="group relative w-10 h-10 rounded-full bg-card border border-border/60 shadow-md flex items-center justify-center
-                       hover:scale-110 hover:border-primary/40 transition-all duration-200 hover:-translate-y-1"
+            className="group relative w-10 h-10 rounded-full liquid-glass flex items-center justify-center
+                       hover:scale-110 hover:-translate-y-1 transition-all duration-300"
             title="微信: 似我随性"
           >
             <QrCode className="w-[18px] h-[18px]" color="#07c160" />
             <span className="absolute left-full ml-2.5 px-2.5 py-1 rounded-md bg-foreground text-background text-xs font-medium
-                             opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity duration-200
+                             opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all duration-200
                              -translate-x-1 group-hover:translate-x-0">
               微信 · 似我随性
             </span>
@@ -83,14 +86,14 @@ export default function ContactDock() {
         </div>
       </div>
 
-      {/* 微信二维码弹窗 */}
+      {/* 微信二维码弹窗 — Liquid Glass */}
       {showQr && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20 backdrop-blur-md"
           onClick={() => setShowQr(false)}
         >
           <div
-            className="relative bg-card rounded-xl border border-border p-5 shadow-2xl max-w-xs mx-4 animate-fade-in-up"
+            className="liquid-glass relative rounded-3xl p-6 max-w-xs mx-4 animate-fade-in-scale"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -106,7 +109,7 @@ export default function ContactDock() {
             <img
               src="/wechat-qr.jpg"
               alt="微信二维码"
-              className="w-56 h-auto mx-auto rounded-lg border border-border"
+              className="w-56 h-auto mx-auto rounded-2xl border border-border"
             />
             <p className="text-center text-xs text-muted-foreground mt-3">扫一扫，添加我为朋友</p>
           </div>

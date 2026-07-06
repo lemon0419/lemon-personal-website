@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { t } from '@/lib/i18n';
-import { ExternalLink, ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer, Clock, EyeIcon } from 'lucide-react';
+import { useSpotlight } from '@/hooks/useSpotlight';
 
 // ========== 数据 ==========
 
@@ -33,24 +34,45 @@ const SUDOKU_VERSIONS = [
   },
 ];
 
-// 公众号推文数据（来自 PortfolioPage 真实链接）
+// 公众号推文数据 — 带日期、阅读量、描述、缩略图
 const ARTICLES = [
-  { id: 1, titleKey: 'article1' as const, url: 'https://mp.weixin.qq.com/s/XBVZgWBNEST4x3hKpdiFLg', color: 'hsl(15 55% 90%)' },
-  { id: 2, titleKey: 'article2' as const, url: 'https://mp.weixin.qq.com/s/w4PFpnbhtAbt45dsdBYolA', color: 'hsl(90 25% 90%)' },
-  { id: 3, titleKey: 'article3' as const, url: 'https://mp.weixin.qq.com/s/bBx8E5e5Fi1Gdn-_xwmIhA', color: 'hsl(200 30% 92%)' },
-  { id: 4, titleKey: 'article4' as const, url: 'https://mp.weixin.qq.com/s/TGOMee_4d9YN_wwR2aUX0w', color: 'hsl(45 40% 90%)' },
-  { id: 5, titleKey: 'article5' as const, url: 'https://mp.weixin.qq.com/s/6BTxkiyG5LBfbbF4j1d7jg', color: 'hsl(340 25% 92%)' },
-  { id: 6, titleKey: 'article6' as const, url: 'https://mp.weixin.qq.com/s/UZFAJFk3aFJPr99tiJSyZw', color: 'hsl(160 20% 92%)' },
-  { id: 7, titleKey: 'article7' as const, url: 'https://mp.weixin.qq.com/s/rFKE2955F1gj8SGO16ROsQ', color: 'hsl(270 20% 92%)' },
+  {
+    id: 1,
+    titleKey: 'article1' as const,
+    url: 'https://mp.weixin.qq.com/s/XBVZgWBNEST4x3hKpdiFLg',
+    date: '2025.02.16',
+    reads: '原创',
+    desc: '年后，《哪吒2》一直在各大主流网站上被热烈讨论，电影播出近半个月，网友们看着票房不断上升...',
+    thumb: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120"><rect width="160" height="120" fill="#f5efe8" rx="8"/><rect x="40" y="30" width="80" height="50" rx="4" fill="#fff" stroke="#d4ccc0" stroke-width="1.5"/><rect x="50" y="40" width="25" height="3" rx="1.5" fill="#8e7b6a" opacity="0.4"/><rect x="50" y="48" width="40" height="3" rx="1.5" fill="#8e7b6a" opacity="0.3"/><rect x="50" y="56" width="30" height="3" rx="1.5" fill="#8e7b6a" opacity="0.3"/><circle cx="95" cy="55" r="12" fill="none" stroke="#8e7b6a" stroke-width="1.5" opacity="0.3"/><path d="M88 55 L92 59 L102 49" stroke="#8e7b6a" stroke-width="1.5" fill="none" opacity="0.3"/></svg>'),
+  },
+  {
+    id: 2,
+    titleKey: 'article2' as const,
+    url: 'https://mp.weixin.qq.com/s/w4PFpnbhtAbt45dsdBYolA',
+    date: '2025.03.19',
+    reads: '原创',
+    desc: '让人无语的脑残恋爱剧罢了，女主是一个小有名气的漫画家，男主是已经退役的单板滑雪运动员...',
+    thumb: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120"><rect width="160" height="120" fill="#f0f5e8" rx="8"/><rect x="35" y="55" width="90" height="30" rx="6" fill="#fff" stroke="#b8c9a0" stroke-width="1.5"/><circle cx="50" cy="72" r="6" fill="#b8c9a0"/><circle cx="110" cy="72" r="6" fill="#b8c9a0"/><rect x="45" y="48" width="40" height="12" rx="4" fill="#fff" stroke="#b8c9a0" stroke-width="1.5"/><path d="M65 42 L70 48 L90 48" stroke="#b8c9a0" stroke-width="1.5" fill="none"/><rect x="90" y="40" width="20" height="8" rx="2" fill="#d4e5c0" opacity="0.5"/></svg>'),
+  },
+  {
+    id: 3,
+    titleKey: 'article3' as const,
+    url: 'https://mp.weixin.qq.com/s/bBx8E5e5Fi1Gdn-_xwmIhA',
+    date: '2025.03.19',
+    reads: '原创',
+    desc: '反容貌焦虑的偶像剧看过不少，韩剧特别多，《内在美》、《女神降临》、《我的ID是江南美人》等等...',
+    thumb: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120"><rect width="160" height="120" fill="#e8eef5" rx="8"/><rect x="50" y="25" width="60" height="40" rx="6" fill="#fff" stroke="#a0b8c9" stroke-width="1.5"/><rect x="60" y="35" width="40" height="3" rx="1.5" fill="#6a8298" opacity="0.4"/><rect x="60" y="42" width="30" height="3" rx="1.5" fill="#6a8298" opacity="0.3"/><rect x="60" y="49" width="20" height="3" rx="1.5" fill="#6a8298" opacity="0.3"/><rect x="35" y="75" width="90" height="20" rx="4" fill="#fff" stroke="#a0b8c9" stroke-width="1" opacity="0.6"/></svg>'),
+  },
 ];
 
 // ========== 子组件 ==========
 
-/* 迷你数独轮播卡 */
-function MiniSudokuCarousel() {
+/* 数独轮播卡片 — 等大布局，保留内部版本切换 */
+function SudokuCard() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const spotlightRef = useSpotlight<HTMLDivElement>();
   const total = SUDOKU_VERSIONS.length;
 
   const changeSlide = useCallback((newIdx: number) => {
@@ -75,102 +97,111 @@ function MiniSudokuCarousel() {
   const currentItem = SUDOKU_VERSIONS[currentIndex];
 
   return (
-    <div className="relative h-full min-h-[220px]">
-      <div className="relative w-full h-full bg-card border border-border rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-300">
-        {/* 媒体区域 */}
-        <div className="relative h-[150px] overflow-hidden bg-muted/30">
-          {currentItem.isVideo ? (
-            <video
-              ref={videoRef}
-              src={currentItem.image}
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-              poster={currentItem.poster}
-            />
-          ) : (
-            <img
-              src={currentItem.image}
-              alt={currentItem.title}
-              className="w-full h-full object-contain p-1"
-            />
-          )}
+    <div
+      ref={spotlightRef}
+      className="spotlight-card relative bg-card border border-border/60 rounded-2xl overflow-hidden diffusion-shadow
+                 hover:border-primary/20 transition-all duration-400 flex flex-col h-full"
+    >
+      {/* 媒体区域 — 统一比例 */}
+      <div className="relative h-[180px] overflow-hidden bg-muted/30 flex-shrink-0">
+        {currentItem.isVideo ? (
+          <video
+            ref={videoRef}
+            src={currentItem.image}
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+            poster={currentItem.poster}
+          />
+        ) : (
+          <img
+            src={currentItem.image}
+            alt={currentItem.title}
+            className="w-full h-full object-contain p-2"
+          />
+        )}
 
-          {/* 版本标签 */}
-          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold">
-            {currentItem.version.toUpperCase()}
+        {/* 版本标签 */}
+        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold z-10">
+          {currentItem.version.toUpperCase()}
+        </div>
+
+        {/* 切换箭头 — 图片区域 */}
+        <button
+          onClick={() => changeSlide((currentIndex - 1 + total) % total)}
+          className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/80 dark:bg-black/40 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white dark:hover:bg-black/60 transition-colors z-10"
+          aria-label="上一个版本"
+        >
+          <ChevronLeft className="w-4 h-4 text-foreground" />
+        </button>
+        <button
+          onClick={() => changeSlide((currentIndex + 1) % total)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/80 dark:bg-black/40 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white dark:hover:bg-black/60 transition-colors z-10"
+          aria-label="下一个版本"
+        >
+          <ChevronRight className="w-4 h-4 text-foreground" />
+        </button>
+      </div>
+
+      {/* 信息区 */}
+      <div className="relative z-10 p-4 flex flex-col flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-sm font-bold text-foreground">{currentItem.title}</h4>
+          <span className="text-[10px] text-muted-foreground">{currentItem.subtitle}</span>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 flex-1">
+          简约可爱风格的数独小游戏，从初代原型到移动端 App 的三次迭代。
+        </p>
+
+        {/* 版本指示器 + 操作按钮 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            {SUDOKU_VERSIONS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => changeSlide(idx)}
+                className={`transition-all duration-300 ${
+                  idx === currentIndex
+                    ? 'w-5 h-2 rounded-full bg-primary'
+                    : 'w-2 h-2 rounded-full bg-border hover:bg-primary/50'
+                }`}
+              />
+            ))}
           </div>
-
-          {/* 游玩按钮 */}
           {currentItem.liveUrl && (
             <a
               href={currentItem.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full bg-white/90 text-[11px] font-medium shadow-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-medium hover:bg-primary/20 transition-colors"
             >
               <Eye className="w-3 h-3" /> 玩
             </a>
           )}
-        </div>
-
-        {/* 信息区 */}
-        <div className="p-3 space-y-1.5">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-bold text-foreground leading-tight">{currentItem.title}</h4>
-            <span className="text-[10px] text-muted-foreground">{currentItem.subtitle}</span>
-          </div>
-
-          {/* 切换控制 */}
-          <div className="flex items-center gap-1.5 pt-1">
-            <button
-              onClick={() => changeSlide((currentIndex - 1 + total) % total)}
-              className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-accent/10 transition-colors shrink-0"
-              aria-label="上一个版本"
-            >
-              <ChevronLeft className="w-3 h-3" />
-            </button>
-            <div className="flex items-center gap-1 flex-1 justify-center">
-              {SUDOKU_VERSIONS.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => changeSlide(idx)}
-                  className={`transition-all duration-300 ${
-                    idx === currentIndex
-                      ? 'w-4 h-1.5 rounded-full bg-primary'
-                      : 'w-1.5 h-1.5 rounded-full bg-border hover:bg-primary/50'
-                  }`}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => changeSlide((currentIndex + 1) % total)}
-              className="w-5 h-5 rounded-full border border-border flex items-center justify-center hover:bg-accent/10 transition-colors shrink-0"
-              aria-label="下一个版本"
-            >
-              <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/* 人物原型学习站卡片 */
+/* 人物原型卡片 — 等大统一格式 */
 function PrototypeCard({ locale }: { locale: 'zh' | 'en' }) {
+  const spotlightRef = useSpotlight<HTMLAnchorElement>();
+
   return (
     <a
+      ref={spotlightRef}
       href="/works/prototypes.html"
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative w-full h-full min-h-[220px] bg-card border border-border rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-300 flex flex-col"
+      className="spotlight-card group relative bg-card border border-border/60 rounded-2xl overflow-hidden
+                 diffusion-shadow hover:border-primary/20 transition-all duration-400 flex flex-col h-full"
     >
-      {/* 上部：视觉区域 */}
-      <div className="relative flex-1 bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-950/20 dark:to-blue-950/20 p-4 flex items-center justify-center overflow-hidden">
-        {/* 装饰性 SVG：人形轮廓 */}
-        <svg viewBox="0 0 120 120" className="w-24 h-24 text-primary/20" xmlns="http://www.w3.org/2000/svg">
+      {/* 视觉区域 — 统一比例 */}
+      <div className="relative h-[180px] bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-950/20 dark:to-blue-950/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+        <svg viewBox="0 0 120 120" className="w-20 h-20 text-primary/20" xmlns="http://www.w3.org/2000/svg">
           <circle cx="60" cy="32" r="20" fill="none" stroke="currentColor" strokeWidth="2" />
           <path d="M28 108 Q28 68 60 58 Q92 68 92 108" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           <circle cx="54" cy="28" r="2.5" fill="currentColor" opacity="0.5" />
@@ -178,20 +209,21 @@ function PrototypeCard({ locale }: { locale: 'zh' | 'en' }) {
           <path d="M54 38 Q60 44 66 38" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
         </svg>
 
-        {/* 类型标签 */}
-        <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/60 text-[10px] font-medium text-muted-foreground">
+        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/70 dark:bg-black/30 backdrop-blur-sm text-[10px] font-medium text-muted-foreground">
           <Library className="w-3 h-3" />
           <span>{t(locale, 'webProject')}</span>
         </div>
       </div>
 
-      {/* 下部：信息 */}
-      <div className="p-3 space-y-1.5">
-        <h4 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+      {/* 信息区 */}
+      <div className="relative z-10 p-4 flex flex-col flex-1">
+        <h4 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors mb-2">
           {t(locale, 'project2')}
         </h4>
-        <p className="text-[10px] text-muted-foreground">{t(locale, 'project2Desc')}</p>
-        <div className="flex items-center gap-1 pt-0.5 text-xs font-medium text-primary group-hover:text-accent transition-colors">
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 flex-1">
+          {t(locale, 'project2Desc')}
+        </p>
+        <div className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-accent transition-colors">
           <span>{t(locale, 'viewProject')}</span>
           <ArrowUpRight className="w-3 h-3" />
         </div>
@@ -200,38 +232,42 @@ function PrototypeCard({ locale }: { locale: 'zh' | 'en' }) {
   );
 }
 
-/* 番茄钟卡片 */
+/* 番茄钟卡片 — 等大统一格式 */
 function PomodoroCard({ locale }: { locale: 'zh' | 'en' }) {
+  const spotlightRef = useSpotlight<HTMLAnchorElement>();
+
   return (
     <a
+      ref={spotlightRef}
       href="/works/pomodoro.html"
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative w-full h-full min-h-[220px] bg-card border border-border rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-md transition-all duration-300 flex flex-col"
+      className="spotlight-card group relative bg-card border border-border/60 rounded-2xl overflow-hidden
+                 diffusion-shadow hover:border-primary/20 transition-all duration-400 flex flex-col h-full"
     >
-      {/* 上部：视觉区域 */}
-      <div className="relative flex-1 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-4 flex items-center justify-center overflow-hidden">
-        {/* 装饰性 SVG：番茄 */}
+      {/* 视觉区域 — 统一比例 */}
+      <div className="relative h-[180px] bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 flex items-center justify-center overflow-hidden flex-shrink-0">
         <svg viewBox="0 0 120 120" className="w-20 h-20 text-red-500/20" xmlns="http://www.w3.org/2000/svg">
           <circle cx="60" cy="65" r="40" fill="none" stroke="currentColor" strokeWidth="3" />
           <path d="M60 25 L60 40 M45 30 L52 42 M75 30 L68 42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           <ellipse cx="60" cy="65" rx="35" ry="38" fill="currentColor" opacity="0.1" />
         </svg>
 
-        {/* 类型标签 */}
-        <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/60 text-[10px] font-medium text-muted-foreground">
+        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/70 dark:bg-black/30 backdrop-blur-sm text-[10px] font-medium text-muted-foreground">
           <Timer className="w-3 h-3" />
           <span>{t(locale, 'webProject')}</span>
         </div>
       </div>
 
-      {/* 下部：信息 */}
-      <div className="p-3 space-y-1.5">
-        <h4 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+      {/* 信息区 */}
+      <div className="relative z-10 p-4 flex flex-col flex-1">
+        <h4 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors mb-2">
           {t(locale, 'project3')}
         </h4>
-        <p className="text-[10px] text-muted-foreground">{t(locale, 'project3Desc')}</p>
-        <div className="flex items-center gap-1 pt-0.5 text-xs font-medium text-primary group-hover:text-accent transition-colors">
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 flex-1">
+          {t(locale, 'project3Desc')}
+        </p>
+        <div className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-accent transition-colors">
           <span>{t(locale, 'viewProject')}</span>
           <ArrowUpRight className="w-3 h-3" />
         </div>
@@ -240,27 +276,61 @@ function PomodoroCard({ locale }: { locale: 'zh' | 'en' }) {
   );
 }
 
-/* 推文小卡片 */
-function ArticleCard({ article, locale }: { article: typeof ARTICLES[0]; locale: 'zh' | 'en' }) {
+/* 公众号推文列表项 — 带缩略图 */
+function ArticleListItem({ article, locale, index }: { article: typeof ARTICLES[0]; locale: 'zh' | 'en'; index: number }) {
+  const spotlightRef = useSpotlight<HTMLAnchorElement>();
+
   return (
     <a
+      ref={spotlightRef}
       href={article.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block border border-border rounded-lg p-3 hover:border-primary/30 hover:shadow-sm transition-all duration-300"
-      style={{ background: article.color }}
+      className="spotlight-card group flex items-center gap-4 md:gap-5 bg-card border border-border/40 rounded-2xl p-4 md:p-5
+                 diffusion-shadow hover:border-primary/20 transition-all duration-400"
+      style={{ animationDelay: `${index * 80}ms` }}
     >
-      <div className="space-y-1.5">
-        <div className="flex items-start gap-2">
-          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
-          <h5 className="text-xs font-semibold text-foreground leading-tight line-clamp-1 group-hover:text-primary transition-colors">
-            {t(locale, article.titleKey)}
-          </h5>
+      {/* 左侧文字区 */}
+      <div className="flex-1 min-w-0 space-y-2">
+        {/* 日期 + 阅读量 */}
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {article.date}
+          </span>
+          <span className="w-px h-3 bg-border" />
+          <span className="flex items-center gap-1">
+            <EyeIcon className="w-3 h-3" />
+            {article.reads}
+          </span>
         </div>
-        <div className="flex items-center gap-1 pl-5.5 text-[9px] text-primary/60 group-hover:text-primary transition-colors">
+
+        {/* 标题 */}
+        <h5 className="text-sm font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+          {t(locale, article.titleKey)}
+        </h5>
+
+        {/* 摘要 */}
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-2 hidden md:block">
+          {article.desc}
+        </p>
+
+        {/* 查看原文 */}
+        <div className="flex items-center gap-1 text-[10px] text-primary/70 group-hover:text-primary transition-colors pt-0.5">
+          <FileText className="w-3 h-3" />
           <span>{t(locale, 'viewOriginal')}</span>
           <ArrowUpRight className="w-2.5 h-2.5" />
         </div>
+      </div>
+
+      {/* 右侧缩略图 */}
+      <div className="shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-muted/30 border border-border/30">
+        <img
+          src={article.thumb}
+          alt={t(locale, article.titleKey)}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
       </div>
     </a>
   );
@@ -272,7 +342,7 @@ export default function PortfolioSection() {
   const { locale } = useI18n();
 
   return (
-    <section className="space-y-6 animate-fade-in-up">
+    <section className="space-y-8 animate-fade-in-up">
       {/* 标题行 */}
       <div className="flex items-center gap-2">
         <ExternalLink className="w-5 h-5 text-primary" />
@@ -284,38 +354,37 @@ export default function PortfolioSection() {
         </h2>
       </div>
 
-      {/* ===== 个人项目 ===== */}
-      <div className="space-y-2">
+      <p className="text-sm text-muted-foreground leading-relaxed -mt-4">
+        {t(locale, 'portfolioDesc')}
+      </p>
+
+      {/* ===== 个人项目 — 等大卡片，切换式展示 ===== */}
+      <div className="space-y-3">
         <p className="text-xs text-muted-foreground font-medium pl-1" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
           {t(locale, 'projectSection')}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* 左：数独轮播 */}
-          <div className="group">
-            <MiniSudokuCarousel />
-          </div>
-
-          {/* 中：人物原型学习站 */}
+        {/* 3列等大卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SudokuCard />
           <PrototypeCard locale={locale} />
-
-          {/* 右：番茄钟 */}
           <PomodoroCard locale={locale} />
         </div>
       </div>
 
-      {/* ===== 公众号推文 ===== */}
-      <div className="space-y-2">
+      {/* ===== 公众号推文 — 列表式，带缩略图 ===== */}
+      <div className="space-y-3">
         <p className="text-xs text-muted-foreground font-medium pl-1" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
           {t(locale, 'articleSection')}
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {ARTICLES.map((article) => (
-            <ArticleCard
+        <div className="space-y-3">
+          {ARTICLES.map((article, idx) => (
+            <ArticleListItem
               key={article.id}
               article={article}
               locale={locale}
+              index={idx}
             />
           ))}
         </div>

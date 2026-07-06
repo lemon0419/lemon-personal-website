@@ -367,39 +367,33 @@ export default function FloatingDiscPlayer({
             </svg>
           </div>
 
-          {/* 播放状态光晕 */}
+          {/* 播放状态光晕 — Ardot 扩散阴影 */}
           {playing && (
             <div
               className="absolute inset-0 rounded-full pointer-events-none"
               style={{
                 animation: 'float-glow 2s ease-in-out infinite alternate',
+                boxShadow:
+                  '0 0 16px 4px hsl(var(--primary) / 0.15), 0 0 36px 8px hsl(var(--primary) / 0.08), 0 0 60px 16px hsl(var(--primary) / 0.04)',
+                borderRadius: '50%',
               }}
-            >
-              <div
-                className="w-full h-full rounded-full"
-                style={{
-                  boxShadow: '0 0 20px 4px hsl(var(--primary) / 0.2), 0 0 40px 8px hsl(200 40% 55% / 0.12)',
-                }}
-              />
-            </div>
+            />
           )}
         </div>
 
-        {/* 歌曲名浮动标签 */}
+        {/* 歌曲名浮动标签 — Liquid Glass */}
         <div
-          className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-250 pointer-events-none"
+          className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 pointer-events-none"
           style={{
             opacity: showLabel ? 1 : 0,
             transform: showLabel ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(4px)',
           }}
         >
           <span
-            className="inline-block px-3 py-1.5 text-xs rounded-lg shadow-md"
+            className="liquid-glass inline-block px-3 py-1.5 text-xs rounded-lg"
             style={{
-              background: 'hsl(var(--card))',
               color: 'hsl(var(--foreground))',
               fontFamily: "'LXGW WenKai', 'PingFang SC', sans-serif",
-              border: '1px solid hsl(var(--border))',
               letterSpacing: '0.02em',
             }}
           >

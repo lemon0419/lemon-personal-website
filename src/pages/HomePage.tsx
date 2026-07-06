@@ -3,15 +3,17 @@ import { useI18n } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { t } from '@/lib/i18n';
 import {
-  Sun, Moon, Sparkles, Mail, Music, BookOpen, Clapperboard, Theater,
+  Sun, Moon, Sparkles, Music, BookOpen, Clapperboard, Theater,
   Feather, Brain, Compass, GraduationCap, Building2, Award,
-  BarChart3, Package, MonitorSmartphone, Trophy
+  BarChart3, Package, MonitorSmartphone, Trophy, ArrowRight,
+  ExternalLink, Mail, ChevronDown
 } from 'lucide-react';
 import DigitalTwinChat from '@/components/DigitalTwinChat';
 import PortfolioSection from '@/components/PortfolioSection';
 import ContactDock from '@/components/ContactDock';
+import { useSpotlight, useScrollReveal, useMagnetic } from '@/hooks/useSpotlight';
 
-// ========== 组件 ==========
+// ========== 子组件 ==========
 
 // 手绘风格头像 SVG
 function SketchAvatar() {
@@ -48,7 +50,7 @@ function StickyTag({ label, icon: Icon, color }: { label: string; icon: typeof M
         style={{
           background: color,
           borderRadius: '3px 12px 3px 12px',
-          color: 'hsl(0 0% 24%)',
+          color: 'hsl(0 0% 22%)',
           boxShadow: '2px 2px 0 hsl(0 0% 0% / 0.08)',
           fontFamily: "'LXGW WenKai', sans-serif",
         }}
@@ -62,50 +64,103 @@ function StickyTag({ label, icon: Icon, color }: { label: string; icon: typeof M
   );
 }
 
-// 小装饰 - 星星
-function LittleStar({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} style={style} fill="currentColor">
-      <path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4 1.5-7.5L3 9l6.5-.5z" opacity="0.6" />
-    </svg>
-  );
-}
 
-// 小装饰 - 调色盘
-function LittlePalette({ className, style }: { className?: string; style?: React.CSSProperties }) {
+// 工作经历条目 — 交替布局
+function WorkEntry({
+  company, role, period, descriptions, index
+}: {
+  company: string;
+  role: string;
+  period: string;
+  descriptions: string[];
+  index: number;
+}) {
+  const isEven = index % 2 === 0;
   return (
-    <svg viewBox="0 0 24 24" className={className} style={style} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <circle cx="12" cy="12" r="9" />
-      <circle cx="8" cy="10" r="1.5" fill="currentColor" />
-      <circle cx="15" cy="8" r="1.5" fill="currentColor" />
-      <circle cx="16" cy="14" r="1.5" fill="currentColor" />
-      <circle cx="10" cy="16" r="1.5" fill="currentColor" />
-    </svg>
-  );
-}
-
-// 技能卡片
-function SkillCard({ icon: Icon, title, desc, color }: { icon: typeof Award; title: string; desc: string; color: string }) {
-  return (
-    <div className="sketch-border p-4 md:p-5 border border-border bg-card transition-all duration-300 hover:border-primary/40 space-y-2">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${color}20` }}>
-          <Icon className="w-4 h-4" style={{ color }} />
+    <div className="animate-stagger" style={{ animationDelay: `${index * 120}ms` }}>
+      <div className={`flex items-start gap-6 md:gap-12 ${isEven ? '' : 'md:flex-row-reverse'}`}>
+        {/* 内容区 */}
+        <div className="flex-1 space-y-3 min-w-0">
+          <div className="flex items-center gap-3">
+            <h3
+              className="text-base md:text-lg font-bold text-foreground"
+              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+            >
+              {company}
+            </h3>
+            <div className="h-px flex-1 bg-border/50 hidden md:block" />
+          </div>
+          <p className="text-sm text-accent font-medium">{role}</p>
+          <ul className="pt-2 space-y-2.5">
+            {descriptions.map((desc, idx) => (
+              <li
+                key={idx}
+                className="text-sm text-muted-foreground leading-relaxed pl-4 relative"
+              >
+                <span
+                  className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full"
+                  style={{ background: 'hsl(var(--primary) / 0.35)' }}
+                />
+                {desc}
+              </li>
+            ))}
+          </ul>
         </div>
-        <h3 className="text-sm font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-          {title}
-        </h3>
+
+        {/* 日期锚点 */}
+        <span
+          className="shrink-0 pt-1 text-lg md:text-2xl font-light select-none font-outfit tracking-wider"
+          style={{
+            color: 'hsl(var(--border))',
+            lineHeight: 1,
+          }}
+        >
+          {period.split(' ')[0]}
+        </span>
       </div>
-      <p className="text-xs text-muted-foreground leading-relaxed pl-10">{desc}</p>
+    </div>
+  );
+}
+
+// Bento 技能卡片 — 带 Spotlight 边框效果
+function BentoSkillCard({
+  icon: Icon, title, desc, color, large = false, tall = false
+}: {
+  icon: typeof Award; title: string; desc: string; color: string; large?: boolean; tall?: boolean;
+}) {
+  const spotlightRef = useSpotlight<HTMLDivElement>();
+
+  return (
+    <div
+      ref={spotlightRef}
+      className={`spotlight-card bento-card ${tall ? 'bento-tall' : ''} ${large ? 'bento-wide' : ''} group cursor-default`}
+    >
+      <div className="relative z-10 space-y-3">
+        <div className="flex items-start gap-3">
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110"
+            style={{ background: `${color}18`, border: `1px solid ${color}30` }}
+          >
+            <Icon className="w-5 h-5" style={{ color }} />
+          </div>
+          <div className="pt-0.5 space-y-1.5 flex-1">
+            <h3 className="text-sm font-bold text-foreground font-wenkai">{title}</h3>
+            <p className={`text-xs text-muted-foreground leading-relaxed ${large ? '' : 'line-clamp-3'}`}>{desc}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 // 奖项卡片
 function AwardCard({ text, delay }: { text: string; delay: number }) {
+  const spotlightRef = useSpotlight<HTMLDivElement>();
+
   return (
     <div
-      className="sketch-border px-4 py-3 border border-border bg-card flex items-start gap-2 transition-all duration-300 hover:border-accent/40 animate-fade-in-up"
+      ref={spotlightRef}
+      className="spotlight-card animate-stagger sketch-border-subtle px-5 py-3.5 border border-border/60 bg-surface-elevated/50 flex items-start gap-3 transition-all duration-300"
       style={{ animationDelay: `${delay}ms` }}
     >
       <Trophy className="w-4 h-4 text-accent shrink-0 mt-0.5" />
@@ -114,25 +169,51 @@ function AwardCard({ text, delay }: { text: string; delay: number }) {
   );
 }
 
+// 滚动揭示包装器
+function ScrollSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+  return (
+    <section ref={ref} className={`scroll-reveal ${isVisible ? 'is-visible' : ''} ${className}`}>
+      {children}
+    </section>
+  );
+}
+
+// 章节标题
+function SectionHeader({ icon: Icon, title, accent = false }: { icon: typeof Award; title: string; accent?: boolean }) {
+  return (
+    <div className="flex items-center gap-3 animate-fade-in-up">
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${accent ? 'bg-accent/10' : 'bg-primary/10'}`}>
+        <Icon className={`w-4 h-4 ${accent ? 'text-accent' : 'text-primary'}`} />
+      </div>
+      <h2 className="text-lg md:text-xl font-bold text-foreground font-wenkai">
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-border/30" />
+    </div>
+  );
+}
+
 const TAGS = [
-  { label: '音乐剧', icon: Music, color: 'hsl(15 60% 88%)' },
-  { label: '话剧', icon: Theater, color: 'hsl(90 25% 88%)' },
-  { label: '舞剧', icon: Clapperboard, color: 'hsl(35 50% 88%)' },
-  { label: '小说', icon: BookOpen, color: 'hsl(200 30% 90%)' },
-  { label: '电视剧', icon: Clapperboard, color: 'hsl(45 40% 88%)' },
-  { label: '女性主义', icon: Feather, color: 'hsl(340 30% 90%)' },
-  { label: '内容表达', icon: Feather, color: 'hsl(160 25% 90%)' },
-  { label: '知识整理', icon: Brain, color: 'hsl(270 20% 90%)' },
-  { label: '产品运营', icon: Compass, color: 'hsl(50 35% 88%)' },
-  { label: '随性', icon: Sparkles, color: 'hsl(30 30% 90%)' },
+  { labelKey: 'tagMusical' as const, icon: Music, color: 'hsl(15 60% 88%)' },
+  { labelKey: 'tagTheater' as const, icon: Theater, color: 'hsl(90 25% 88%)' },
+  { labelKey: 'tagDance' as const, icon: Clapperboard, color: 'hsl(35 50% 88%)' },
+  { labelKey: 'tagNovel' as const, icon: BookOpen, color: 'hsl(200 30% 90%)' },
+  { labelKey: 'tagTV' as const, icon: Clapperboard, color: 'hsl(45 40% 88%)' },
+  { labelKey: 'tagFeminism' as const, icon: Feather, color: 'hsl(340 30% 90%)' },
+  { labelKey: 'tagContent' as const, icon: Feather, color: 'hsl(160 25% 90%)' },
+  { labelKey: 'tagKnowledge' as const, icon: Brain, color: 'hsl(270 20% 90%)' },
+  { labelKey: 'tagProduct' as const, icon: Compass, color: 'hsl(50 35% 88%)' },
+  { labelKey: 'tagSpontaneity' as const, icon: Sparkles, color: 'hsl(30 30% 90%)' },
 ];
 
-// ========== 页面 ==========
+// ========== 页面主体 ==========
 
 export default function HomePage() {
   const { locale, toggleLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const chatRef = useRef<HTMLDivElement>(null);
+  const heroBtnRef = useMagnetic<HTMLButtonElement>(0.25);
 
   const scrollToChat = () => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -140,14 +221,17 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      {/* 顶部导航栏 */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between">
+      {/* Mesh Gradient Background — organic animated color blobs */}
+      <div className="mesh-gradient-bg" />
+
+      {/* ========== 顶部导航 — Liquid Glass ========== */}
+      <header className="sticky top-0 z-40 w-full border-b border-border/40 liquid-glass">
+        <div className="mx-auto max-w-4xl px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
             </div>
-            <span className="text-sm font-medium text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
+            <span className="text-sm font-medium text-foreground font-wenkai">
               {t(locale, 'name')}
             </span>
           </div>
@@ -155,26 +239,21 @@ export default function HomePage() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => window.location.href = '/portfolio'}
-              className="px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+              className="directional-hover px-3 py-1.5 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground transition-colors font-wenkai"
             >
               {t(locale, 'portfolio')}
             </button>
             <div className="w-px h-4 bg-border mx-1" />
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+              className="directional-hover w-9 h-9 flex items-center justify-center rounded-full transition-colors"
               aria-label={theme === 'light' ? t(locale, 'darkMode') : t(locale, 'lightMode')}
             >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <Sun className="w-4 h-4 text-muted-foreground" />
-              )}
+              {theme === 'light' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
             </button>
             <button
               onClick={toggleLocale}
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-xs font-medium text-muted-foreground"
+              className="directional-hover w-9 h-9 flex items-center justify-center rounded-full transition-colors text-xs font-medium text-muted-foreground"
               aria-label="Switch language"
             >
               {t(locale, 'switchLang')}
@@ -183,265 +262,192 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-8 md:py-12 space-y-12">
-        {/* 首行 CTA — 聊天入口 */}
-        <section className="flex flex-col items-center text-center animate-fade-in-up">
-          <button
-            onClick={scrollToChat}
-            className="group relative px-7 py-3 rounded-full bg-primary text-primary-foreground text-sm font-medium
-                       hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-            style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-          >
-            <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
-              {t(locale, 'chatWithMe')}
-            </span>
-          </button>
-          <p className="mt-2 text-xs text-muted-foreground/60">{t(locale, 'askMeAnything')}</p>
-        </section>
-
-        {/* 装饰分隔 */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-16 h-px bg-border" />
-          <div className="w-2 h-2 rounded-full bg-accent/50" />
-          <div className="w-16 h-px bg-border" />
-        </div>
-
-        {/* 关于我 */}
-        <section className="space-y-8 animate-fade-in-up">
-          <div className="text-center">
-            <h2
-              className="text-2xl md:text-3xl font-bold text-foreground inline-block relative"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-            >
-              {t(locale, 'aboutMe')}
-              <span className="absolute -bottom-1 left-0 w-full h-1 bg-accent/40 rounded-full" />
-            </h2>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
-            <div className="relative shrink-0">
-              <div
-                className="relative p-4 md:p-6"
-                style={{
-                  borderRadius: '50% 45% 55% 48% / 55% 48% 52% 45%',
-                  border: '2.5px solid hsl(var(--border))',
-                  background: 'hsl(var(--card))',
-                }}
-              >
-                <div className="text-foreground">
-                  <SketchAvatar />
-                </div>
+      <main className="relative mx-auto max-w-4xl px-4 md:px-6 py-8 md:py-16 space-y-20 md:space-y-28">
+        {/* ========== 个人宣言 / 身份区 — 非对称 Hero ========== */}
+        <section className="space-y-8 md:space-y-10 animate-fade-in-up">
+          {/* 个人宣言区域 */}
+          <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-12">
+            {/* 左侧：身份声明 */}
+            <div className="flex-1 space-y-4 md:space-y-5 md:pt-6">
+              <div className="space-y-3">
+                <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground/50 font-outfit font-medium">
+                  Personal · {t(locale, 'name')}
+                </p>
+                <h1
+                  className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground"
+                  style={{ fontFamily: "'LXGW WenKai', 'PingFang SC', sans-serif" }}
+                >
+                  {t(locale, 'tagline')}
+                </h1>
               </div>
-              <LittleStar className="absolute -top-2 -right-2 w-5 h-5 text-accent/60 animate-float" />
-              <LittlePalette className="absolute -bottom-1 -left-3 w-6 h-6 text-primary/50 animate-float" style={{ animationDelay: '1s' }} />
-              <LittleStar className="absolute top-1/2 -right-5 w-3 h-3 text-accent/40 animate-float" style={{ animationDelay: '0.5s' }} />
-            </div>
-
-            <div className="flex-1 space-y-4 text-center md:text-left">
-              <p
-                className="text-base md:text-lg font-semibold"
-                style={{ fontFamily: "'LXGW WenKai', sans-serif", color: 'hsl(var(--accent))' }}
-              >
-                {t(locale, 'tagline')}
-              </p>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
                 {t(locale, 'aboutDesc1')}
               </p>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                {t(locale, 'aboutDesc2')}
-              </p>
+              <div className="flex items-center gap-4 pt-2">
+                <button
+                  ref={heroBtnRef}
+                  onClick={scrollToChat}
+                  className="magnetic-btn group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium
+                             hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300 font-wenkai"
+                >
+                  <Sparkles className="w-4 h-4 group-hover:animate-pulse" />
+                  <span>{t(locale, 'chatWithMe')}</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                </button>
+                <p className="text-xs text-muted-foreground/50">{t(locale, 'askMeAnything')}</p>
+              </div>
+            </div>
+
+{/* 右侧：个人照片 — 融入背景 */}
+            <div className="shrink-0 relative">
+              <div
+                className="relative w-40 h-52 md:w-52 md:h-68 overflow-hidden"
+                style={{
+                  borderRadius: '60% 40% 50% 50% / 50% 45% 55% 50%',
+                  maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 50%, transparent 100%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 50%, transparent 100%)',
+                }}
+              >
+                <img
+                  src="/images/character/一位年轻的中国女性_黑色长发_戴圆框眼镜_穿浅色衬衫_极简黑_2026-07-06T09-08-10.png"
+                  alt="Portrait"
+                  className="w-full h-full object-cover"
+                  style={{
+                    opacity: 0.85,
+                  }}
+                />
+              </div>
+              {/* 装饰光晕 */}
+              <div
+                className="absolute -inset-4 -z-10 rounded-full opacity-30"
+                style={{
+                  background: 'radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.15), transparent 70%)',
+                  filter: 'blur(20px)',
+                }}
+              />
             </div>
           </div>
 
-          <div className="pt-4">
-            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+          {/* 补充描述 + 标签 */}
+          <div className="space-y-4">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
+              {t(locale, 'aboutDesc2')}
+            </p>
+            <div className="flex flex-wrap gap-3 md:gap-4">
               {TAGS.map((tag, index) => (
-                <div key={tag.label} className="animate-fade-in-up" style={{ animationDelay: `${index * 80}ms` }}>
-                  <StickyTag label={tag.label} icon={tag.icon} color={tag.color} />
+                <div key={tag.labelKey} className="animate-stagger" style={{ animationDelay: `${index * 80}ms` }}>
+                  <StickyTag label={t(locale, tag.labelKey)} icon={tag.icon} color={tag.color} />
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* 教育经历 */}
-        <section className="space-y-2 animate-fade-in-up">
-          <div className="flex items-center gap-2 mb-10">
-            <GraduationCap className="w-5 h-5 text-primary" />
-            <h2
-              className="text-lg md:text-xl font-bold text-foreground"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-            >
-              {t(locale, 'education')}
-            </h2>
-          </div>
+        {/* ========== 分隔 ========== */}
+        <div className="section-divider">
+          <div className="section-divider-dot" />
+        </div>
 
-          {/* 编辑风：左内容 + 右日期 */}
-          <div className="py-8 md:py-12 border-b border-border/20 last:border-0">
+        {/* ========== 教育经历 — 编辑风 ========== */}
+        <ScrollSection className="space-y-8">
+          <SectionHeader icon={GraduationCap} title={t(locale, 'education')} />
+
+          <div className="animate-stagger" style={{ animationDelay: '100ms' }}>
             <div className="flex items-start gap-6 md:gap-12">
-              {/* 左侧：内容 */}
               <div className="flex-1 space-y-3 min-w-0">
-                <h3
-                  className="text-base md:text-lg font-bold text-foreground"
-                  style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-                >
+                <h3 className="text-base md:text-lg font-bold text-foreground font-wenkai">
                   {t(locale, 'eduSchool')}
                 </h3>
                 <p className="text-sm text-accent font-medium">{t(locale, 'eduMajor')}</p>
                 <div className="pt-2 space-y-2">
-                  <p className="text-xs text-muted-foreground/70 uppercase tracking-wider">{t(locale, 'eduCourse')}</p>
+                  <p className="text-xs text-muted-foreground/60 uppercase tracking-wider">{t(locale, 'eduCourse')}</p>
                   <p className="text-sm text-muted-foreground leading-relaxed max-w-md">{t(locale, 'eduCourseDesc')}</p>
                 </div>
               </div>
-
-              {/* 右侧：大号浅色日期锚点 */}
               <span
-                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
-                style={{
-                  color: 'hsl(var(--border))',
-                  fontFamily: "'LXGW WenKai', 'PingFang SC', sans-serif",
-                  letterSpacing: '0.05em',
-                  lineHeight: 1,
-                }}
+                className="shrink-0 pt-1 text-lg md:text-2xl font-light select-none text-border"
+                style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '0.03em', lineHeight: 1 }}
               >
                 {t(locale, 'eduPeriod').split(' ')[0]}
               </span>
             </div>
           </div>
-        </section>
+        </ScrollSection>
 
-        {/* 装饰分隔 */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-16 h-px bg-border" />
-          <div className="w-2 h-2 rounded-full bg-accent/50" />
-          <div className="w-16 h-px bg-border" />
+        {/* ========== 分隔 ========== */}
+        <div className="section-divider">
+          <div className="section-divider-dot" />
         </div>
 
-        {/* 工作经历 - 编辑风时间线 */}
-        <section className="space-y-2 animate-fade-in-up">
-          <div className="flex items-center gap-2 mb-10">
-            <Building2 className="w-5 h-5 text-primary" />
-            <h2
-              className="text-lg md:text-xl font-bold text-foreground"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-            >
-              {t(locale, 'workExperience')}
-            </h2>
-          </div>
+        {/* ========== 工作经历 — 交替时间线 ========== */}
+        <ScrollSection className="space-y-8">
+          <SectionHeader icon={Building2} title={t(locale, 'workExperience')} />
 
-          {/* === 工作经历 1 === */}
-          <div className="py-8 md:py-12 border-b border-border/20">
-            <div className="flex items-start gap-6 md:gap-12">
-              <div className="flex-1 space-y-3 min-w-0">
-                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-                  {t(locale, 'work1Company')}
-                </h3>
-                <p className="text-sm text-accent font-medium">{t(locale, 'work1Role')}</p>
-                <ul className="pt-2 space-y-2">
-                  {[t(locale, 'work1Desc1'), t(locale, 'work1Desc2'), t(locale, 'work1Desc3')].map((desc, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
-                      {desc}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <span
-                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
-                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
-              >
-                {t(locale, 'work1Period').split(' ')[0]}
-              </span>
-            </div>
-          </div>
+          <div className="space-y-10 md:space-y-14 relative">
+            {/* 时间线 */}
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-border/40 hidden md:block" style={{ left: 'calc(50% - 0.5px)' }} />
 
-          {/* === 工作经历 2 === */}
-          <div className="py-8 md:py-12 border-b border-border/20">
-            <div className="flex items-start gap-6 md:gap-12">
-              <div className="flex-1 space-y-3 min-w-0">
-                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-                  {t(locale, 'work2Company')}
-                </h3>
-                <p className="text-sm text-accent font-medium">{t(locale, 'work2Role')}</p>
-                <ul className="pt-2 space-y-2">
-                  {[t(locale, 'work2Desc1'), t(locale, 'work2Desc2')].map((desc, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
-                      {desc}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <span
-                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
-                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
-              >
-                {t(locale, 'work2Period').split(' ')[0]}
-              </span>
-            </div>
-          </div>
+            <WorkEntry
+              company={t(locale, 'work1Company')}
+              role={t(locale, 'work1Role')}
+              period={t(locale, 'work1Period')}
+              descriptions={[t(locale, 'work1Desc1'), t(locale, 'work1Desc2'), t(locale, 'work1Desc3')]}
+              index={0}
+            />
 
-          {/* === 工作经历 3 === */}
-          <div className="py-8 md:py-12">
-            <div className="flex items-start gap-6 md:gap-12">
-              <div className="flex-1 space-y-3 min-w-0">
-                <h3 className="text-base md:text-lg font-bold text-foreground" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
-                  {t(locale, 'work3Company')}
-                </h3>
-                <p className="text-sm text-accent font-medium">{t(locale, 'work3Role')}</p>
-                <ul className="pt-2 space-y-2">
-                  {[t(locale, 'work3Desc1'), t(locale, 'work3Desc2'), t(locale, 'work3Desc3')].map((desc, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground leading-relaxed max-w-md pl-3" style={{ borderLeft: '2px solid hsl(var(--primary) / 0.25)' }}>
-                      {desc}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <span
-                className="shrink-0 pt-1 text-2xl md:text-4xl font-light select-none"
-                style={{ color: 'hsl(var(--border))', fontFamily: "'LXGW WenKai', sans-serif", letterSpacing: '0.05em', lineHeight: 1 }}
-              >
-                {t(locale, 'work3Period').split(' ')[0]}
-              </span>
-            </div>
-          </div>
-        </section>
+            <WorkEntry
+              company={t(locale, 'work2Company')}
+              role={t(locale, 'work2Role')}
+              period={t(locale, 'work2Period')}
+              descriptions={[t(locale, 'work2Desc1'), t(locale, 'work2Desc2')]}
+              index={1}
+            />
 
-        {/* 装饰分隔 */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-16 h-px bg-border" />
-          <div className="w-2 h-2 rounded-full bg-accent/50" />
-          <div className="w-16 h-px bg-border" />
+            <WorkEntry
+              company={t(locale, 'work3Company')}
+              role={t(locale, 'work3Role')}
+              period={t(locale, 'work3Period')}
+              descriptions={[t(locale, 'work3Desc1'), t(locale, 'work3Desc2'), t(locale, 'work3Desc3')]}
+              index={2}
+            />
+          </div>
+        </ScrollSection>
+
+        {/* ========== 分隔 ========== */}
+        <div className="section-divider">
+          <div className="section-divider-dot" />
         </div>
 
-        {/* 作品集 */}
-        <PortfolioSection />
+        {/* ========== 作品集 ========== */}
+        <ScrollSection className="space-y-8">
+          <PortfolioSection />
+        </ScrollSection>
 
-        {/* 装饰分隔 */}
-        <section className="space-y-6 animate-fade-in-up">
-          <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-primary" />
-            <h2
-              className="text-lg md:text-xl font-bold text-foreground"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-            >
-              {t(locale, 'skillsAwards')}
-            </h2>
-          </div>
+        {/* ========== 分隔 ========== */}
+        <div className="section-divider">
+          <div className="section-divider-dot" />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <SkillCard
+        {/* ========== 技能与奖项 — Bento Grid ========== */}
+        <ScrollSection className="space-y-8">
+          <SectionHeader icon={Award} title={t(locale, 'skillsAwards')} accent />
+
+          {/* Bento 非对称技能网格 */}
+          <div className="bento-grid">
+            <BentoSkillCard
               icon={MonitorSmartphone}
               title={t(locale, 'skillPlatform')}
               desc={t(locale, 'skillPlatformDesc')}
               color="hsl(30 35% 55%)"
+              large
             />
-            <SkillCard
+            <BentoSkillCard
               icon={BarChart3}
               title={t(locale, 'skillOffice')}
               desc={t(locale, 'skillOfficeDesc')}
               color="hsl(90 10% 55%)"
             />
-            <SkillCard
+            <BentoSkillCard
               icon={Package}
               title={t(locale, 'skillErp')}
               desc={t(locale, 'skillErpDesc')}
@@ -449,40 +455,53 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="space-y-3">
+          {/* 奖项 + 场景插画 */}
+          <div className="space-y-3 pt-2">
             <AwardCard text={t(locale, 'award1')} delay={200} />
             <AwardCard text={t(locale, 'award2')} delay={400} />
           </div>
-        </section>
+          <div className="flex justify-end pt-1">
+            <div className="img-framed">
+              <img
+                src="/images/character/scene-creating.png"
+                alt="Creating scene"
+                className="w-36 h-36 md:w-48 md:h-48 object-cover"
+              />
+            </div>
+          </div>
+        </ScrollSection>
 
-        {/* 装饰分隔 */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-16 h-px bg-border" />
-          <div className="w-2 h-2 rounded-full bg-accent/50" />
-          <div className="w-16 h-px bg-border" />
+        {/* ========== 分隔 ========== */}
+        <div className="section-divider">
+          <div className="section-divider-dot" />
         </div>
 
-        {/* 数字分身聊天区 */}
-        <section ref={chatRef} className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-primary" />
-            <h2
-              className="text-lg md:text-xl font-bold text-foreground"
-              style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-            >
-              {t(locale, 'digitalTwin')}
-            </h2>
+        {/* ========== 数字分身聊天区 ========== */}
+        <ScrollSection className="space-y-6">
+          <SectionHeader icon={Mail} title={t(locale, 'digitalTwin')} />
+          <div ref={chatRef}>
+            <DigitalTwinChat />
           </div>
-          <DigitalTwinChat />
-        </section>
+        </ScrollSection>
       </main>
 
-      {/* 底部 */}
-      <footer className="border-t border-border/50 py-6 mt-8">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            {t(locale, 'contactDesc')}
-          </p>
+      {/* ========== 底部 — 分隔线 + 渐变文字 ========== */}
+      <footer className="pt-8 pb-8">
+        <div className="mx-auto max-w-4xl px-4 md:px-6">
+          <div className="section-divider mb-6">
+            <div className="section-divider-dot" />
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-primary" />
+              </div>
+              <span className="text-xs text-muted-foreground font-wenkai">{t(locale, 'name')}</span>
+            </div>
+            <p className="text-xs text-muted-foreground/50">
+              {t(locale, 'contactDesc')}
+            </p>
+          </div>
         </div>
       </footer>
 
