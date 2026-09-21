@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { t } from '@/lib/i18n';
-import { ExternalLink, ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer, Clock, EyeIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer, Clock, EyeIcon } from 'lucide-react';
 import { useSpotlight } from '@/hooks/useSpotlight';
 
 // ========== 数据 ==========
@@ -454,15 +454,35 @@ export default function PortfolioSection() {
 
   return (
     <section className="space-y-8 animate-fade-in-up">
-      {/* 标题行 */}
-      <div className="flex items-center gap-2">
-        <ExternalLink className="w-5 h-5 text-primary" />
-        <h2
-          className="text-lg md:text-xl font-bold text-foreground"
-          style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
-        >
-          {t(locale, 'portfolio')}
-        </h2>
+      {/* 标题行 — Heartstopper 章节风格（04. Make · 绿色） */}
+      <div className="relative animate-fade-in-up">
+        <div
+          className="chapter-wash w-40 h-16 -top-4 -left-6"
+          style={{ background: 'hsl(var(--hs-green))' }}
+        />
+        <div className="flex items-end gap-2.5 md:gap-3 flex-wrap relative">
+          <span className="chapter-no font-marker text-3xl md:text-4xl" style={{ color: 'hsl(var(--hs-green))' }}>
+            04.
+          </span>
+          <h2
+            className="text-xl md:text-2xl font-bold text-foreground font-wenkai leading-none pt-1"
+            style={{ fontFamily: "'LXGW WenKai', sans-serif" }}
+          >
+            {t(locale, 'portfolio')}
+          </h2>
+          <span className="font-marker text-sm md:text-base leading-none pt-2 opacity-50" style={{ color: 'hsl(var(--hs-green))' }}>
+            Make
+          </span>
+        </div>
+        <svg viewBox="0 0 120 10" className="w-36 md:w-44 h-2.5 mt-2.5" preserveAspectRatio="none" fill="none">
+          <path
+            d="M3 6 Q 15 1, 28 5 T 55 5 T 82 5 T 117 4"
+            stroke="hsl(var(--hs-green))"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            opacity="0.55"
+          />
+        </svg>
       </div>
 
       <p className="text-sm text-muted-foreground leading-relaxed -mt-4">

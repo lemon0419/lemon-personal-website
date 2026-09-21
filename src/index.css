@@ -2,14 +2,16 @@
 @import url('https://chinese-font.netlify.app/packages/lxgwwenkai/dist/LXGWWenKai-Regular/result.css');
 @import url('https://chinese-font.netlify.app/packages/lxgwwenkai/dist/LXGWWenKai-Bold/result.css');
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /*
- *  Design System — Ardot-inspired
+ *  Design System — Ardot × Heartstopper
  *  All colors in HSL. No pure black. Single accent, muted palette.
+ *  Heartstopper layer: per-chapter macaron colors + brush lettering + doodles.
  */
 
 @layer base {
@@ -52,6 +54,18 @@
     --success: 142 40% 45%;
     --warning: 38 48% 48%;
     --info: 200 45% 48%;
+
+    /* ===== Heartstopper macaron palette（每章一个专属色）===== */
+    --hs-pink: 355 70% 78%;
+    --hs-coral: 8 75% 74%;
+    --hs-peach: 22 80% 76%;
+    --hs-yellow: 45 85% 68%;
+    --hs-green: 100 40% 66%;
+    --hs-teal: 175 45% 66%;
+    --hs-blue: 205 60% 76%;
+    --hs-lavender: 265 45% 78%;
+    --hs-purple: 285 35% 72%;
+    --hs-leaf: 25 72% 60%;
     --education-blue: 210 40% 55%;
     --education-green: 160 35% 50%;
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
@@ -395,6 +409,96 @@
 
 .sketch-border-subtle {
   border-radius: 180px 20px 160px 20px / 20px 180px 20px 160px;
+}
+
+/* =====================================================
+ *  HEARTSTOPPER LAYER — 章节化 + 马卡龙 + 涂鸦
+ *  灵感：Heartstopper 片头卡（每章一色 · 手绘笔刷 · 落叶涂鸦）
+ *  + 《俗女养成记》书封（墨色克制 · 粉彩只做点睛）
+ * ===================================================== */
+
+/* 马克笔笔刷字体 — 章节编号 / 英文点缀 */
+.font-marker {
+  font-family: 'Permanent Marker', 'LXGW WenKai', cursive;
+  letter-spacing: 0.02em;
+}
+
+/* 章节编号 — 轻微歪斜，像随手写上去的 */
+.chapter-no {
+  display: inline-block;
+  transform: rotate(-4deg);
+  line-height: 1;
+}
+
+/* 手绘荧光笔涂刷 — 关键词高亮背景 */
+.brush-highlight {
+  position: relative;
+  display: inline-block;
+  z-index: 0;
+}
+
+.brush-highlight::before {
+  content: '';
+  position: absolute;
+  left: -0.15em;
+  right: -0.15em;
+  bottom: 0.08em;
+  height: 0.42em;
+  z-index: -1;
+  border-radius: 4px 10px 6px 12px / 10px 4px 12px 6px;
+  background: hsl(var(--hs-pink) / 0.45);
+  transform: rotate(-1.2deg);
+}
+
+/* 手绘波浪下划线容器 */
+.brush-underline {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* ===== 涂鸦动画 ===== */
+
+/* 落叶摇曳 — Heartstopper 标志性的叶子 */
+@keyframes doodle-sway {
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  50%      { transform: rotate(10deg) translateY(-4px); }
+}
+
+.doodle-sway {
+  animation: doodle-sway 3.2s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* 星光闪烁 */
+@keyframes doodle-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
+  50%      { opacity: 1; transform: scale(1.15) rotate(18deg); }
+}
+
+.doodle-twinkle {
+  animation: doodle-twinkle 2.4s ease-in-out infinite;
+}
+
+/* 小闪电抖动 */
+@keyframes doodle-zap {
+  0%, 92%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+  94%           { transform: scale(1.25) rotate(-8deg); opacity: 1; }
+  96%           { transform: scale(0.95) rotate(6deg); opacity: 0.8; }
+  98%           { transform: scale(1.15) rotate(-4deg); opacity: 1; }
+}
+
+.doodle-zap {
+  animation: doodle-zap 3.6s ease-in-out infinite;
+}
+
+/* 章节标题下的粉彩色晕 — 极淡，像水彩渗开 */
+.chapter-wash {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(36px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Chat bubbles */

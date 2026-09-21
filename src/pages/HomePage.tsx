@@ -4,9 +4,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { t } from '@/lib/i18n';
 import {
   Sun, Moon, Sparkles, Music, BookOpen, Clapperboard, Theater,
-  Feather, Brain, Compass, GraduationCap, Building2, Award,
-  BarChart3, Package, MonitorSmartphone, Trophy, ArrowRight,
-  ExternalLink, Mail, ChevronDown
+  Feather, Brain, Compass, Award,
+  BarChart3, Package, MonitorSmartphone, Trophy, ArrowRight
 } from 'lucide-react';
 import DigitalTwinChat from '@/components/DigitalTwinChat';
 import PortfolioSection from '@/components/PortfolioSection';
@@ -14,6 +13,66 @@ import ContactDock from '@/components/ContactDock';
 import { useSpotlight, useScrollReveal, useMagnetic } from '@/hooks/useSpotlight';
 
 // ========== 子组件 ==========
+
+// ===== Heartstopper 涂鸦组件 =====
+
+// 标志性落叶 🍂
+function DoodleLeaf({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} style={style} xmlns="http://www.w3.org/2000/svg" fill="none">
+      <path
+        d="M12 2.5 C 8 6.5, 5.5 11.5, 7.5 17 Q 12 21.5 16.5 17 C 18.5 11.5, 16 6.5, 12 2.5 Z"
+        fill="hsl(var(--hs-leaf))"
+        opacity="0.85"
+      />
+      <path d="M12 5.5 L 11 19.5" stroke="hsl(25 50% 38%)" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M12 9 L 9 11 M12 12.5 L 15 14.5" stroke="hsl(25 50% 38%)" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
+
+// 四角星光 ✨
+function DoodleSparkle({ className = '', style, color = 'hsl(var(--hs-yellow))' }: { className?: string; style?: React.CSSProperties; color?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} style={style} xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill={color} />
+    </svg>
+  );
+}
+
+// 小闪电 ⚡
+function DoodleLightning({ className = '', style, color = 'hsl(var(--hs-yellow))' }: { className?: string; style?: React.CSSProperties; color?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} style={style} xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 2 L5 13 L11 13 L9.5 22 L19 9 L13 9.5 Z" fill={color} opacity="0.9" />
+    </svg>
+  );
+}
+
+// 手绘波浪线 〜
+function DoodleSquiggle({ className = '', style, color }: { className?: string; style?: React.CSSProperties; color: string }) {
+  return (
+    <svg viewBox="0 0 120 10" className={className} style={style} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="none">
+      <path
+        d="M3 6 Q 15 1, 28 5 T 55 5 T 82 5 T 117 4"
+        stroke={color}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+// 章节配色 — Heartstopper 马卡龙
+const HS = {
+  pink: 'hsl(var(--hs-pink))',
+  blue: 'hsl(var(--hs-blue))',
+  peach: 'hsl(var(--hs-peach))',
+  green: 'hsl(var(--hs-green))',
+  yellow: 'hsl(var(--hs-yellow))',
+  lavender: 'hsl(var(--hs-lavender))',
+};
 
 // 手绘风格头像 SVG
 function SketchAvatar() {
@@ -179,32 +238,52 @@ function ScrollSection({ children, className = '' }: { children: React.ReactNode
   );
 }
 
-// 章节标题
-function SectionHeader({ icon: Icon, title, accent = false }: { icon: typeof Award; title: string; accent?: boolean }) {
+// 章节标题 — Heartstopper 风格：编号 + 中文标题 + 英文手写词 + 涂鸦
+function ChapterHeader({
+  no, word, title, color, doodle
+}: {
+  no: string;
+  word: string;
+  title: string;
+  color: string;
+  doodle?: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center gap-3 animate-fade-in-up">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${accent ? 'bg-accent/10' : 'bg-primary/10'}`}>
-        <Icon className={`w-4 h-4 ${accent ? 'text-accent' : 'text-primary'}`} />
+    <div className="relative animate-fade-in-up">
+      {/* 粉彩水彩晕 */}
+      <div
+        className="chapter-wash w-40 h-16 -top-4 -left-6"
+        style={{ background: color }}
+      />
+      <div className="flex items-end gap-2.5 md:gap-3 flex-wrap relative">
+        <span className="chapter-no font-marker text-3xl md:text-4xl" style={{ color }}>
+          {no}
+        </span>
+        <h2 className="text-xl md:text-2xl font-bold text-foreground font-wenkai leading-none pt-1">
+          {title}
+        </h2>
+        <span className="font-marker text-sm md:text-base leading-none pt-2 opacity-50" style={{ color }}>
+          {word}
+        </span>
+        <div className="flex-1 min-w-[1.5rem]" />
+        {doodle}
       </div>
-      <h2 className="text-lg md:text-xl font-bold text-foreground font-wenkai">
-        {title}
-      </h2>
-      <div className="h-px flex-1 bg-border/30" />
+      <DoodleSquiggle className="w-36 md:w-44 h-2.5 mt-2.5" color={color} />
     </div>
   );
 }
 
 const TAGS = [
-  { labelKey: 'tagMusical' as const, icon: Music, color: 'hsl(15 60% 88%)' },
-  { labelKey: 'tagTheater' as const, icon: Theater, color: 'hsl(90 25% 88%)' },
-  { labelKey: 'tagDance' as const, icon: Clapperboard, color: 'hsl(35 50% 88%)' },
-  { labelKey: 'tagNovel' as const, icon: BookOpen, color: 'hsl(200 30% 90%)' },
-  { labelKey: 'tagTV' as const, icon: Clapperboard, color: 'hsl(45 40% 88%)' },
-  { labelKey: 'tagFeminism' as const, icon: Feather, color: 'hsl(340 30% 90%)' },
-  { labelKey: 'tagContent' as const, icon: Feather, color: 'hsl(160 25% 90%)' },
-  { labelKey: 'tagKnowledge' as const, icon: Brain, color: 'hsl(270 20% 90%)' },
-  { labelKey: 'tagProduct' as const, icon: Compass, color: 'hsl(50 35% 88%)' },
-  { labelKey: 'tagSpontaneity' as const, icon: Sparkles, color: 'hsl(30 30% 90%)' },
+  { labelKey: 'tagMusical' as const, icon: Music, color: 'hsl(var(--hs-pink) / 0.35)' },
+  { labelKey: 'tagTheater' as const, icon: Theater, color: 'hsl(var(--hs-green) / 0.35)' },
+  { labelKey: 'tagDance' as const, icon: Clapperboard, color: 'hsl(var(--hs-peach) / 0.4)' },
+  { labelKey: 'tagNovel' as const, icon: BookOpen, color: 'hsl(var(--hs-blue) / 0.35)' },
+  { labelKey: 'tagTV' as const, icon: Clapperboard, color: 'hsl(var(--hs-yellow) / 0.38)' },
+  { labelKey: 'tagFeminism' as const, icon: Feather, color: 'hsl(var(--hs-purple) / 0.3)' },
+  { labelKey: 'tagContent' as const, icon: Feather, color: 'hsl(var(--hs-teal) / 0.35)' },
+  { labelKey: 'tagKnowledge' as const, icon: Brain, color: 'hsl(var(--hs-lavender) / 0.35)' },
+  { labelKey: 'tagProduct' as const, icon: Compass, color: 'hsl(var(--hs-coral) / 0.35)' },
+  { labelKey: 'tagSpontaneity' as const, icon: Sparkles, color: 'hsl(var(--hs-blue) / 0.28)' },
 ];
 
 // ========== 页面主体 ==========
@@ -270,15 +349,24 @@ export default function HomePage() {
             {/* 左侧：身份声明 */}
             <div className="flex-1 space-y-4 md:space-y-5 md:pt-6">
               <div className="space-y-3">
-                <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground/50 font-outfit font-medium">
-                  Personal · {t(locale, 'name')}
-                </p>
+                <div className="flex items-center gap-3">
+                  <span className="chapter-no font-marker text-xl md:text-2xl" style={{ color: HS.pink }}>
+                    01.
+                  </span>
+                  <span className="font-marker text-base md:text-lg opacity-60" style={{ color: HS.pink }}>
+                    Meet
+                  </span>
+                  <span className="text-xs tracking-[0.2em] uppercase text-muted-foreground/50 font-outfit font-medium">
+                    · {t(locale, 'name')}
+                  </span>
+                </div>
                 <h1
                   className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground"
                   style={{ fontFamily: "'LXGW WenKai', 'PingFang SC', sans-serif" }}
                 >
                   {t(locale, 'tagline')}
                 </h1>
+                <DoodleSquiggle className="w-48 md:w-64 h-2.5" color={HS.pink} />
               </div>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
                 {t(locale, 'aboutDesc1')}
@@ -298,8 +386,15 @@ export default function HomePage() {
               </div>
             </div>
 
-{/* 右侧：个人照片 — 融入背景 */}
+            {/* 右侧：个人照片 — 融入背景 + Heartstopper 落叶涂鸦 */}
             <div className="shrink-0 relative">
+              {/* 落叶涂鸦 */}
+              <DoodleLeaf className="doodle-sway absolute -top-5 -right-2 w-7 h-7 z-10" />
+              <DoodleLeaf
+                className="doodle-sway absolute -bottom-3 -left-5 w-5 h-5 z-10"
+                style={{ animationDelay: '-1.6s' }}
+              />
+              <DoodleSparkle className="doodle-twinkle absolute top-8 -left-6 w-4 h-4" color={HS.pink} />
               <div
                 className="relative w-40 h-52 md:w-52 md:h-68 overflow-hidden"
                 style={{
@@ -348,9 +443,15 @@ export default function HomePage() {
           <div className="section-divider-dot" />
         </div>
 
-        {/* ========== 教育经历 — 编辑风 ========== */}
+        {/* ========== 教育经历 — 02. Learn 蓝色章节 ========== */}
         <ScrollSection className="space-y-8">
-          <SectionHeader icon={GraduationCap} title={t(locale, 'education')} />
+          <ChapterHeader
+            no="02."
+            word="Learn"
+            title={t(locale, 'education')}
+            color={HS.blue}
+            doodle={<DoodleSparkle className="doodle-twinkle w-5 h-5 mb-1" color={HS.blue} />}
+          />
 
           <div className="animate-stagger" style={{ animationDelay: '100ms' }}>
             <div className="flex items-start gap-6 md:gap-12">
@@ -379,9 +480,15 @@ export default function HomePage() {
           <div className="section-divider-dot" />
         </div>
 
-        {/* ========== 工作经历 — 交替时间线 ========== */}
+        {/* ========== 工作经历 — 03. Work 桃色章节 ========== */}
         <ScrollSection className="space-y-8">
-          <SectionHeader icon={Building2} title={t(locale, 'workExperience')} />
+          <ChapterHeader
+            no="03."
+            word="Work"
+            title={t(locale, 'workExperience')}
+            color={HS.peach}
+            doodle={<DoodleLeaf className="doodle-sway w-5 h-5 mb-1" />}
+          />
 
           <div className="space-y-10 md:space-y-14 relative">
             {/* 时间线 */}
@@ -428,9 +535,15 @@ export default function HomePage() {
           <div className="section-divider-dot" />
         </div>
 
-        {/* ========== 技能与奖项 — Bento Grid ========== */}
+        {/* ========== 技能与奖项 — 05. Skills 黄色章节 ========== */}
         <ScrollSection className="space-y-8">
-          <SectionHeader icon={Award} title={t(locale, 'skillsAwards')} accent />
+          <ChapterHeader
+            no="05."
+            word="Skills"
+            title={t(locale, 'skillsAwards')}
+            color={HS.yellow}
+            doodle={<DoodleLightning className="doodle-zap w-5 h-5 mb-1" color={HS.yellow} />}
+          />
 
           {/* Bento 非对称技能网格 */}
           <div className="bento-grid">
@@ -476,9 +589,15 @@ export default function HomePage() {
           <div className="section-divider-dot" />
         </div>
 
-        {/* ========== 数字分身聊天区 ========== */}
+        {/* ========== 数字分身聊天区 — 06. Talk 紫色章节 ========== */}
         <ScrollSection className="space-y-6">
-          <SectionHeader icon={Mail} title={t(locale, 'digitalTwin')} />
+          <ChapterHeader
+            no="06."
+            word="Talk"
+            title={t(locale, 'digitalTwin')}
+            color={HS.lavender}
+            doodle={<DoodleSparkle className="doodle-twinkle w-5 h-5 mb-1" color={HS.lavender} style={{ animationDelay: '-1.2s' }} />}
+          />
           <div ref={chatRef}>
             <DigitalTwinChat />
           </div>
