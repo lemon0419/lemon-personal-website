@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="QTQlUfU7p7Fby0NbMssEuv">
+<head data-page-node-id="pTJNvN0kGJRcO6CvH5HV8F">
+<meta charset="UTF-8" data-page-node-id="dQ4h8f26tl8ELuTsBKi8B1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="FibtYYgFsl1VpOsAjLVufQ">
+<title>生日快乐 · 立体弹出贺卡</title>
+<meta name="description" content="点一下，卡片会立体展开 —— 生日快乐！">
+<meta name="theme-color" content="#f3ead6">
+<meta property="og:type" content="website">
+<meta property="og:title" content="生日快乐 · 立体贺卡">
+<meta property="og:description" content="点一下，卡片会立体展开">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; }
+  body{
+    font-family: "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive, sans-serif;
+    background:#eee7d8;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none;
+    background-image: radial-gradient(#ffffff 1.6px, transparent 2px);
+    background-size: 26px 26px; opacity:.6;
+  }
+  body::after{
+    content:""; position:fixed; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(120,105,80,.16) 100%);
+  }
+
+  /* 站酷快乐体（OFL 开源）子集：仅“生日快乐”4 字，内联避免联网 */
+  @font-face{
+    font-family:'KuaiLe';
+    src:url(data:font/woff2;base64,d09GMgABAAAAAANwAAwAAAAABggAAAMgAAIAQgAAAAAAAAAAAAAAAAAAAAAAAAAAHCAGYABMEQgKg1CDFAE2AiQDDgsMAAQgBYNeByAb7QRRlA5KBOJngqky+ihsxJBQJ/ORhJrTUYfNjT0at/E/+lE80O/361xBXLJJUqneCJFSaOKlMTSGkiBE5rdtO+Q3aFcNeITmiGSydvbgB9CClTpALaDuv37UybpceaSn/zW+Od//qXyaKXQgQY3Qx4xNgyKwZ1sqYUELGKC80hKIaMUKBLWbuc/YR2pCqH1AQLVeKcj1zUFACDIUADntDXuUEW+iAmFPbwuXKqqkfKXf5PS7JOLm8PFsavIXW0i3XhAgil8YRCIioRUtoBVjAaFapSgeHuv/WEuzAwXcI+/vR2Lf+m9KAkEQChpQZbTqC9fwCyDvCUkWhanRDBMZzDBBQtI0TAIykg0d6lYMPQDJCJqhgiUPXDuSQcSE7UELGmRPYEJ9agggkDWyGthhD1IgCNQ9KgmPaZpMLapOr94AzdAA1ZkSChM3AEZgenoLsrnDX4wMIBqEP/k5eKC9Y9eOsEtJ/KeoiivLhaxuPDfk+Wcu+IRWCD6ZLJC62J6DbwdqDr19bx2qOvN/sJJo77gTwv3bwDO6FTyl1pGU6U7g6b6/PoHXVsY8mBysOvh7nZgzqrkVGxitpblDuyzVQ9r2mGAtHX6iyvetnPtu7niz9qjUduex1EYsbPwayR1NSQsvPfj7GvsnKuxpy/vJhouJoc/0SbzGkBT+Xdnl/WUgr0T/JThwtZYXJ2PDGI0DY82hZ5sraF1HRejZq/CsmxrMpjQnYY1X/pUH3X+u/lR12KwPAQHR6jV7//ShK3+Vif4JPxs6QVA6+g+POHJ72otyEQQ+kJW3E+DclZ/sazEq+PZiToZF5UiUudckBysgJcGrcOqUskjwCWPQ6TJG9b4xWfERs8mSsEx3nc8uN56OBPNbNMXJzmFGmgplytVJAzhYpVGRjBgxKM2AWUZOIkHLaHEGc7Ey48e0mzXDAZsyLU0ehxkz/KY1KFXKzpl0b5ZJCTPMG9iKYXYeVjaYz4xppZYQxjyKuZuD57L8sbaMs7Kb5WE0pUKJspWONFJR6iJppPY5UVw+cPGuVF9mXVhxjr5IaztFK4dmYsVMAQAAAA==) format('woff2');
+    font-weight:400; font-style:normal; font-display:swap;
+  }
+
+  /* ================= 舞台 ================= */
+  .stage{
+    position:relative;
+    width:min(94vw, 900px);
+    height:min(76vh, 720px);
+    perspective: 2300px;
+    perspective-origin: 50% 44%;
+  }
+  .card{
+    position:absolute; left:50%; top:62%; z-index:3;
+    width:100%; aspect-ratio: 800/520;
+    transform: translate(-50%,-50%) scale(.94);
+    transform-style:preserve-3d;
+    transition: transform 1.4s cubic-bezier(.4,.05,.2,1);
+  }
+  .card.open{ transform: translate(-50%,-50%) translateY(10px) scale(.66); }
+
+  /* 桌面倾角（整张卡躺在桌面上，相机在上方俯看） */
+  .table{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    transform: rotateX(42deg);
+    transition: transform 1.4s cubic-bezier(.4,.05,.2,1);
+  }
+  .card.open .table{ transform: rotateX(68deg); }
+
+  /* 卡片投影 */
+  .shadow3d{
+    position:absolute; inset:-2% -8% -6% -2%;
+    transform: translateZ(-46px) translateX(5%);
+    background: rgba(90,78,58,.34);
+    filter: blur(24px);
+    border-radius: 18px;
+    transition: opacity 1.2s;
+  }
+
+  /* ================= 底板（水平纸面） ================= */
+  .base{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    transform: translateZ(-1px);
+    visibility:hidden;
+  }
+  .card.open .base{ visibility:visible; }
+  .base-print{ position:absolute; inset:0; width:100%; height:100%; }
+
+  /* ================= 立起来的纸片（弹出件） ================= */
+  .piece{
+    position:absolute;
+    transform-origin: 50% 100%;
+    transform-style:preserve-3d;
+    transform: translateX(var(--tx,0)) rotateX(0deg) translateZ(0);
+    opacity:0;
+    transition: transform 1.05s cubic-bezier(.22,1.28,.36,1), opacity .45s;
+    will-change: transform;
+  }
+  .card.open .piece{
+    transform: translateX(var(--tx,0)) rotateX(-90deg) translateZ(0);
+    opacity:1;
+  }
+  .piece svg, .piece img{ display:block; }
+  .piece svg{ width:100%; height:auto; }
+
+  /* 落地投影（平贴底板） */
+  .fshadow{
+    position:absolute; border-radius:50%;
+    background: rgba(95,72,45,.18);
+    filter: blur(9px);
+    opacity:0; transition: opacity .8s .85s;
+    pointer-events:none;
+  }
+  .card.open .fshadow{ opacity:1; }
+
+  /* ---------- 各部件位置（bottom 越小越靠前） ---------- */
+  /* 两簇气球：站在人物身后，气球升到头顶之上 */
+  .k-balls-l{ left:-5%; bottom:44%; width:24%; --tx:0; z-index:1; transition-delay:1.02s; }
+  .k-balls-r{ right:-5%; bottom:44%; width:24%; --tx:0; z-index:1; transition-delay:1.06s; }
+  .k-balls-r svg{ transform: scaleX(-1); }
+
+  /* 两张单人：靠后站（bottom 更大），个头更高，露出整张脸 */
+  .k-p2{ left:16%; bottom:42%; height:68%; --tx:0; z-index:2; transition-delay:1.10s; }
+  .k-p3{ left:43%; bottom:42%; height:74%; --tx:0; z-index:2; transition-delay:1.14s; }
+
+  /* 两张合照：靠前站，压在前面，脸一个都不挡 */
+  .k-p1{ left:-2%; bottom:34%; height:57%; --tx:0; z-index:3; transition-delay:1.18s; }
+  .k-p4{ right:-2%; bottom:34%; height:58%; --tx:0; z-index:3; transition-delay:1.22s; }
+
+  /* 草莓熊：坐在右前方 */
+  .k-bear{ right:8%; bottom:8%; height:26%; --tx:0; z-index:5; transition-delay:1.34s; }
+
+  /* 蛋糕：正中 */
+  .k-cake{ left:50%; bottom:15%; width:23%; --tx:-50%; z-index:6; transition-delay:1.42s; }
+  .k-banner{ left:50%; bottom:3%; width:23%; --tx:-50%; z-index:7; transition-delay:1.48s; }
+
+  .k-person img, .k-bear img{ height:100%; width:auto; }
+
+  /* 人物纸片白边 + 厚度投影 */
+  .k-person img{
+    filter:
+      drop-shadow(2.5px 0 0 #fdf8ea) drop-shadow(-2.5px 0 0 #fdf8ea)
+      drop-shadow(0 2.5px 0 #fdf8ea) drop-shadow(0 -2.5px 0 #fdf8ea)
+      drop-shadow(6px 10px 6px rgba(80,60,40,.28));
+    -webkit-mask-image: linear-gradient(to bottom, #000 84%, rgba(0,0,0,0) 99%);
+    mask-image: linear-gradient(to bottom, #000 84%, rgba(0,0,0,0) 99%);
+  }
+  .k-bear img{
+    filter:
+      drop-shadow(2.6px 0 0 #fdf8ea) drop-shadow(-2.6px 0 0 #fdf8ea)
+      drop-shadow(0 2.6px 0 #fdf8ea) drop-shadow(0 -2.6px 0 #fdf8ea)
+      drop-shadow(5px 9px 6px rgba(80,60,40,.26));
+  }
+  .k-cake svg, .k-banner svg{
+    filter: drop-shadow(5px 9px 5px rgba(80,60,40,.26));
+  }
+  .k-balls-l svg, .k-balls-r svg{
+    filter: drop-shadow(3px 6px 4px rgba(80,60,40,.2));
+  }
+
+  /* ================= 封盖 ================= */
+  .lid{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    transform-origin: 50% 0%;
+    transform: translateZ(4px) rotateX(0deg);
+    transition: transform 1.35s cubic-bezier(.45,.08,.25,1);
+  }
+  .card.open .lid{ transform: translateZ(4px) rotateX(90deg); }
+
+  .lid-face{
+    position:absolute; inset:0;
+    backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:12px; overflow:hidden;
+  }
+  .lid-cover{
+    box-shadow: 0 8px 26px rgba(70,60,40,.3);
+    background:#f9f2e1;
+  }
+  .lid-cover .cover-art{ position:absolute; inset:0; width:100%; height:100%; }
+  .lid-cover .cover-bear{
+    position:absolute; right:1%; bottom:-4%; height:47%;
+    filter: drop-shadow(-3px 6px 10px rgba(110,80,55,.16));
+  }
+
+  .lid-scene{ transform: rotateX(180deg) translateZ(2px); background:#e6d8bb; transform-style:preserve-3d; }
+  .lid-scene .scene-inner{
+    position:absolute; inset:8px 8px -14px 8px; border-radius:4px 4px 0 0; overflow:hidden; background:#f9f2e1;
+  }
+  .wall-art{ position:absolute; inset:0; width:100%; height:100%; }
+
+  /* 墙前散落的纸屑（悬浮层） */
+  .wall-stars{
+    position:absolute; inset:0;
+    transform: translateZ(-19px);
+    pointer-events:none;
+  }
+  .wall-stars svg{ display:block; width:100%; height:100%; }
+
+  /* 悬浮在墙面上的立体彩旗（真正脱离墙面） */
+  .wall-bunting{
+    position:absolute; left:-1%; top:4%; width:102%;
+    transform: translateZ(-26px);
+    filter: drop-shadow(0 8px 7px rgba(90,70,45,.3));
+  }
+  .wall-bunting svg{ display:block; width:100%; height:auto; }
+
+  /* 折线阴影（贴在底板上，靠近后墙处） */
+  .fold-shadow{
+    position:absolute; left:0; right:0; top:0; height:16%;
+    background: linear-gradient(180deg, rgba(80,58,35,.26), rgba(80,58,35,0) 100%);
+    opacity:0; transition: opacity .9s .7s;
+    pointer-events:none;
+  }
+  .card.open .fold-shadow{ opacity:1; }
+
+  /* ================= 钱雨 ================= */
+  .confetti-layer{ position:absolute; inset:-10% 0 0 0; pointer-events:none; z-index:20; overflow:hidden; perspective:900px; }
+
+  /* 钞票：绿钞为主，少量金票 */
+  .money{
+    position:absolute; top:-9%; width:50px; height:26px; opacity:0;
+    display:grid; place-items:center;
+    background:
+      radial-gradient(ellipse 24% 42% at 50% 50%, rgba(255,252,232,.62) 0 62%, rgba(255,252,232,0) 100%),
+      linear-gradient(158deg,#8cc173 0%,#6aa455 46%,#7cb465 100%);
+    border:1.8px solid #f7f0d4; border-radius:2.5px;
+    box-shadow:
+      inset 0 0 0 1.5px rgba(48,92,40,.5),
+      inset 0 0 0 3.2px rgba(255,250,225,.5),
+      0 2px 5px rgba(70,70,50,.22);
+    font-family:Georgia,'Times New Roman',serif; font-weight:bold; font-size:15px;
+    color:#416f36; letter-spacing:.5px;
+    animation: moneyFall linear forwards;
+    will-change: transform, opacity;
+    backface-visibility:visible;
+  }
+  .money::after{ content:'¥'; }
+  .money.gold{
+    background:
+      radial-gradient(ellipse 24% 42% at 50% 50%, rgba(255,255,246,.66) 0 62%, rgba(255,255,246,0) 100%),
+      linear-gradient(158deg,#f6e3a2 0%,#e3c264 48%,#f0d78e 100%);
+    color:#87671b;
+    box-shadow:
+      inset 0 0 0 1.5px rgba(146,110,32,.42),
+      inset 0 0 0 3.2px rgba(255,252,238,.55),
+      0 2px 5px rgba(120,90,30,.22);
+  }
+  .money.blue{
+    background:
+      radial-gradient(ellipse 24% 42% at 50% 50%, rgba(255,255,255,.62) 0 62%, rgba(255,255,255,0) 100%),
+      linear-gradient(158deg,#a3c6e2 0%,#7fadd3 48%,#98bedd 100%);
+    color:#2b577a;
+  }
+
+  /* 金币 */
+  .coin{
+    position:absolute; top:-9%; width:18px; height:18px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle at 34% 30%,#fff2bd 0 18%,#ecc45c 42%,#c99b2c 100%);
+    box-shadow: 0 1px 3px rgba(140,100,30,.3);
+    animation: moneyFall linear forwards;
+    will-change: transform, opacity;
+  }
+
+  @keyframes moneyFall{
+    0%  { opacity:0; transform: translate3d(0,-100px,0) rotate3d(.3,.46,1,0deg) scale(.92); }
+    7%  { opacity:var(--maxo,.94); }
+    45% { transform: translate3d(calc(var(--sx) * .55), 56vh, 0) rotate3d(.3,.46,1,220deg) scale(1); }
+    86% { opacity:calc(var(--maxo,.94) * .95); }
+    100%{ opacity:0; transform: translate3d(var(--sx), 126vh, 0) rotate3d(.3,.46,1,520deg) scale(1); }
+  }
+
+  /* ================= 卡外飘散纸屑 ================= */
+  .air{ position:absolute; inset:-30% -20%; pointer-events:none; z-index:1; }
+  .air i{
+    position:absolute; display:block; opacity:.8;
+    animation: airFloat 7s ease-in-out infinite alternate;
+  }
+  @keyframes airFloat{
+    from{ transform: translate3d(0,0,0) rotate(0deg); }
+    to{ transform: translate3d(14px,-26px,0) rotate(160deg); }
+  }
+
+  /* ================= 音乐开关 ================= */
+  .music{
+    position:fixed; right:16px; bottom:16px; z-index:40;
+    width:44px; height:44px; border-radius:50%; border:none; cursor:pointer;
+    background:#2f6b53; color:#fdf8ea;
+    display:grid; place-items:center;
+    box-shadow: 0 3px 0 #1e4a38, 0 7px 16px rgba(60,80,60,.26);
+    transition: transform .16s ease, background .2s ease;
+  }
+  .music:active{ transform: translateY(2px); }
+  .music.muted{ background:#b8ad94; box-shadow: 0 3px 0 #8f8672, 0 7px 16px rgba(60,80,60,.18); }
+  .music svg{ width:22px; height:22px; display:block; }
+  .music .ico-off{ display:none; }
+  .music.muted .ico-on{ display:none; }
+  .music.muted .ico-off{ display:block; }
+  .music.playing .ico-on{ animation: noteBeat 1.05s ease-in-out infinite; }
+  @keyframes noteBeat{
+    0%,100%{ transform:scale(1) }
+    50%{ transform:scale(1.16) }
+  }
+
+  /* ================= 按钮 ================= */
+  .pill{
+    margin-top:2vh;
+    font-family:inherit; font-weight:bold; font-size:17px; letter-spacing:1px;
+    color:#fdf8ea; background:#2f6b53;
+    border:none; border-radius:999px; padding:12px 30px;
+    box-shadow: 0 4px 0 #1e4a38, 0 8px 16px rgba(60,80,60,.3);
+    cursor:pointer; position:relative; z-index:30;
+    transition: transform .15s;
+  }
+  .pill::after{ content:""; position:absolute; inset:5px; border:2px dashed rgba(253,248,234,.7); border-radius:999px; }
+  .pill:active{ transform: translateY(3px); }
+  .hint{ margin-top:9px; color:#8a7f68; font-size:13px; letter-spacing:2px; z-index:30; }
+
+  .no-anim *{ transition: none !important; animation: none !important; }
+
+  /* 手机竖屏：整卡放大铺满 */
+  @media (max-width: 700px){
+    .stage{ width:100vw; height:min(64vh, 600px); perspective: 1200px; }
+    .card{ top:55%; width:92%; }
+    .card.open{ transform: translate(-50%,-50%) translateY(14px) scale(.86); }
+    .pill{ margin-top:1vh; }
+  }
+</style>
+</head>
+<body data-page-node-id="lado28lJzN6YrgpevOJtjF">
+
+<div class="stage" data-page-node-id="OCMxSKcvu6zi9VXKsFGWgs">
+  <div class="card" id="card" data-page-node-id="8l9mynziwL3eBLKUGovtVj">
+    <div class="table" data-page-node-id="PbVtrQGjqXIfwsglmFMtAy">
+      <div class="shadow3d" data-page-node-id="13v0Q67zv3JfcnlGCB7gWF"></div>
+
+      <!-- ================= 底板 ================= -->
+      <div class="base" data-page-node-id="eUzMq0SFPmqqfJM5ECv4WE">
+        <svg class="base-print" viewBox="0 0 800 520" preserveAspectRatio="none" data-page-node-id="ru1mjuEFDs31UY8DFInczY">
+          <defs data-page-node-id="JTnEgi3HAzDCEBGwu3O5CF">
+            <filter id="rough" x="-8%" y="-8%" width="116%" height="116%" data-page-node-id="qXZ4zxgAXbCbIfZjA0SDys">
+              <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="11" result="n" data-page-node-id="EQgtnK1mgDAAFjGTaADiMz"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G" data-page-node-id="eD3CEaUwgUWCk0GfZ5pmq0"/>
+            </filter>
+            <filter id="paperGrain" x="0" y="0" width="100%" height="100%" data-page-node-id="APwfeQbKOWrYBWfPMga4Rl">
+              <feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="4" stitchTiles="stitch" data-page-node-id="ocpVzir8FlvTq7fNwYUgUb"/>
+              <feColorMatrix type="saturate" values="0" data-page-node-id="fJgHpRwF1wGU2VfLOdUYNo"/>
+            </filter>
+            <path id="star5" d="M0,-13 L3.8,-4.5 L13,-4.5 L5.6,2 L8.2,11 L0,5.6 L-8.2,11 L-5.6,2 L-13,-4.5 L-3.8,-4.5 Z" data-page-node-id="Pxcq7puIn4tbesD1GDdzn6"/>
+          </defs>
+
+          <rect width="800" height="520" fill="#faf4e4" data-page-node-id="KlyWpaSMU0XtgFGD5pmVka"/>
+          <rect width="800" height="520" fill="#7a6242" opacity=".05" style="filter:url(#paperGrain)" data-page-node-id="DtejyMGbRDq7kK2UKHoz1O"/>
+
+          <!-- 蜡笔虚线内框 -->
+          <rect x="18" y="18" width="764" height="484" rx="16" fill="none"
+                stroke="#2f6b53" stroke-width="2.4" stroke-dasharray="13 10" opacity=".3"
+                filter="url(#rough)" data-page-node-id="gUIlhnxnFViqD6vXSXQn9F"/>
+
+          <!-- 地毯：蜡笔涂抹的椭圆 -->
+          <g filter="url(#rough)" data-page-node-id="BCWP5UZKjePTCJrAqhHIYF">
+            <ellipse cx="400" cy="372" rx="246" ry="80" fill="#a8c4ac" opacity=".45" data-page-node-id="wEZa26FZZ3Wve81SqoIMBE"/>
+            <ellipse cx="400" cy="372" rx="246" ry="80" fill="none" stroke="#6f9478" stroke-width="4" opacity=".45" data-page-node-id="RbpzALLHPnTVIbQIvJyk2P"/>
+            <ellipse cx="400" cy="372" rx="214" ry="64" fill="none" stroke="#fdf8ea" stroke-width="3"
+                     stroke-dasharray="12 10" opacity=".8" data-page-node-id="YMNEeo5YuazaVA0MWESlHg"/>
+            <ellipse cx="400" cy="372" rx="168" ry="46" fill="#c3d5c4" opacity=".5" data-page-node-id="ljNsgnKk4GsxYmd7fgPiff"/>
+          </g>
+
+          <!-- 纸面小涂鸦 -->
+          <g opacity=".72" data-page-node-id="Oa8YUKsfZApee8qBScLuxL">
+            <use href="#star5" transform="translate(96,300) scale(.62)" fill="#e9b84c" data-page-node-id="ipe76oCdjENjAw6ADGoStC"/>
+            <use href="#star5" transform="translate(712,318) scale(.5)" fill="#d8503c" data-page-node-id="qqsuHXdCnQb0XQusfYnHC9"/>
+            <use href="#star5" transform="translate(742,438) scale(.42)" fill="#8e83cf" data-page-node-id="I1reKerTi9zjPklBNp5EfA"/>
+            <circle cx="140" cy="452" r="4" fill="#6f9478" data-page-node-id="o7POK2teOngDMpJtQZ3aUJ"/>
+            <circle cx="680" cy="470" r="3.4" fill="#e9b84c" data-page-node-id="QFNHDVw7tSvqHprHvpa6ti"/>
+            <circle cx="64" cy="392" r="3" fill="#d8503c" data-page-node-id="7BzFyDM39VKF3rLSSQ4dyy"/>
+            <path d="M630,442 q10,-9 20,0 q10,9 20,0" fill="none" stroke="#8e83cf" stroke-width="2.6" stroke-linecap="round" data-page-node-id="i9WcoJcBCi5GJJ3hYrMemk"/>
+            <path d="M120,240 q12,0 12,12 q0,12 -12,12 q-12,0 -12,-12 q0,-12 12,-12" fill="none"
+                  stroke="#a8c4ac" stroke-width="2.6" data-page-node-id="FGM5NT5rqfdwze1si8pGxz"/>
+          </g>
+
+          <!-- 前缘小涂鸦 -->
+          <g opacity=".7" data-page-node-id="un8kt76E4qURfeuQuScfBu">
+            <use href="#star5" transform="translate(206,462) scale(.5)" fill="#6f9478" data-page-node-id="hHHJ3eE7Lv9vfFYxyIb4m8"/>
+            <use href="#star5" transform="translate(586,470) scale(.42)" fill="#e9b84c" data-page-node-id="ARR7QdFVh9Almx9C93Dj8F"/>
+            <circle cx="238" cy="486" r="3.2" fill="#d8503c" data-page-node-id="1YZUDhWgqG4ovZVIiUOvSK"/>
+            <circle cx="556" cy="492" r="2.8" fill="#8e83cf" data-page-node-id="yQkHkVCDV8H3FDfInhfQm2"/>
+            <path d="M320,486 q11,-11 22,0 q11,11 22,0" fill="none" stroke="#8e83cf" stroke-width="2.6" stroke-linecap="round" data-page-node-id="g4kJLzsAsszD53ncMuN8ZN"/>
+            <g transform="translate(500,486) scale(.26)" data-page-node-id="FpLQP0vOmil2BQIKdTDBut">
+              <g fill="#eda9b4" data-page-node-id="7lDl1rq9FXgodG410dQuqB"><ellipse cx="0" cy="-28" rx="18" ry="26" data-page-node-id="cpCgeZtW8AaFqRFwFPeBHG"/><ellipse cx="0" cy="-28" rx="18" ry="26" transform="rotate(72)" data-page-node-id="o1hszJ6jZi3uzAPNmNsB37"/><ellipse cx="0" cy="-28" rx="18" ry="26" transform="rotate(144)" data-page-node-id="zEkjHPNmH5y42jk5wo4tkO"/><ellipse cx="0" cy="-28" rx="18" ry="26" transform="rotate(216)" data-page-node-id="3PeNtJ94bO6UFk2iAXJJV2"/><ellipse cx="0" cy="-28" rx="18" ry="26" transform="rotate(288)" data-page-node-id="euj5sb8V7sCoOFysTUGK7O"/></g>
+              <circle r="14" fill="#e9b84c" data-page-node-id="FBrDPOBtjnyslmh0roZlLF"/>
+            </g>
+          </g>
+
+          <!-- 手写字 -->
+          <text x="52" y="492" font-size="16" font-style="italic" fill="#4a3b2f" opacity=".78"
+                style="font-family:'Segoe Print','Comic Sans MS',cursive" data-page-node-id="WshXd8akZzIQQ3Y0GH0cDA">Love you lots <tspan fill="#d8503c" data-page-node-id="htPhtySN7nsqRlregM7Mfh">♡</tspan></text>
+        </svg>
+
+        <div class="fold-shadow" data-page-node-id="qr1TbTfgc61B8iGBQXYkbz"></div>
+
+        <!-- 落地投影 -->
+        <div class="fshadow" style="left:17%; bottom:41%; width:49%; height:15px;" data-page-node-id="5Qwk0tg9N0HACd4wvctwsM"></div>
+        <div class="fshadow" style="left:43%; bottom:41%; width:34%; height:14px;" data-page-node-id="PFrdVLbKpg5ZnuYGJ972GE"></div>
+        <div class="fshadow" style="left:0;   bottom:33%; width:39%; height:14px;" data-page-node-id="G6WJFVAHtsOerEJW2QhY9j"></div>
+        <div class="fshadow" style="right:0;  bottom:33%; width:39%; height:14px;" data-page-node-id="EaKzdzVrYDmcddsL1VDNdQ"></div>
+        <div class="fshadow" style="right:6%; bottom:8%;  width:23%; height:12px;" data-page-node-id="uvDfHhgdleeJLbu8S0ZzLH"></div>
+        <div class="fshadow" style="left:50%; bottom:14%; width:19%; height:12px; margin-left:-9.5%;" data-page-node-id="lxZTx5qBLt4oHYJgAVgtrP"></div>
+        <div class="fshadow" style="left:50%; bottom:2%;  width:23%; height:10px; margin-left:-11.5%;" data-page-node-id="OHoFazCIlQrFQNquJ3Q8gz"></div>
+
+        <!-- ============ 人物立绘 ============ -->
+        <div class="piece k-p2 k-person" data-page-node-id="AmAGoSdLtQUAqqxOhIgQQN"><img src="assets/illus/illu2-full.png" alt="" data-page-node-id="wqTMkDyBqhXEKDGnxF2Z1o"></div>
+        <div class="piece k-p3 k-person" data-page-node-id="BlRKAZ8D1aefKasbXNxkMW"><img src="assets/illus/illu3-full.png" alt="" data-page-node-id="xeNfFqT0HBXALItMHLkWoI"></div>
+        <div class="piece k-p1 k-person" data-page-node-id="HBmH9t8wf1x0SiZgNE9Cbg"><img src="assets/illus/illu1-cut.png" alt="" data-page-node-id="edmgnLTQmL4H3Aw6waHdtM"></div>
+        <div class="piece k-p4 k-person" data-page-node-id="KS2PcEDFOSldyyU9kFcKCV"><img src="assets/illus/illu4-cut.png" alt="" data-page-node-id="zsgTyWTdjyGV7f5FcjYCh3"></div>
+
+        <!-- ============ 草莓熊 ============ -->
+        <div class="piece k-bear" data-page-node-id="bUks0STWfTuOYdg0rGO4jB"><img src="assets/illus/lotso.png" alt="" data-page-node-id="vSalR9621uaN9s3Y3peLHZ"></div>
+
+        <!-- ============ 气球（左右两簇，人物身后，气球升出头顶） ============ -->
+        <div class="piece k-balls-l" data-page-node-id="dsJ3DVv7qCPfEDQxX5fGOu">
+          <svg viewBox="0 0 220 300" data-page-node-id="ifMtdBfsCunSTRQYdG3kqg">
+            <g stroke="#fdf8ea" stroke-width="3.6" fill="none" stroke-linecap="round" data-page-node-id="dnXoQ8VYhEGZVBlBW299MC">
+              <path d="M44,118 q-11,84 4,172" data-page-node-id="kVCM7prs9qSYUz7d68IAI9"/>
+              <path d="M108,104 q10,92 -4,186" data-page-node-id="bqX8bXfSnTVb9GUGmIb8QO"/>
+              <path d="M172,120 q-10,82 5,168" data-page-node-id="FTbWDpgA8lnlLCclm1o905"/>
+            </g>
+            <g stroke="#fdf8ea" stroke-width="3.6" data-page-node-id="9reErkI74HNklwvjp25dWj">
+              <ellipse cx="44"  cy="74" rx="33" ry="42" fill="#e9b84c" data-page-node-id="D1cP4a3HEgGwHjhyQuM0Tm"/>
+              <ellipse cx="108" cy="58" rx="36" ry="46" fill="#a8c4ac" data-page-node-id="XrHFjMdiMOtU8QUmfcwHPU"/>
+              <ellipse cx="172" cy="76" rx="31" ry="40" fill="#d8503c" data-page-node-id="zkm0JDYGSCcXyCL0IwPxC8"/>
+            </g>
+            <g fill="#fdf8ea" data-page-node-id="zA8GzFywvpBKue7InFj5We">
+              <path d="M44,112 l-7,9 14,0 Z" data-page-node-id="2EEda5vJSYO1XlXUGyhuWJ"/><path d="M108,100 l-7,9 14,0 Z" data-page-node-id="IucubnUyr5S9MA2F7Gl0cP"/><path d="M172,112 l-7,9 14,0 Z" data-page-node-id="ILVoNXyDgXOys2mUGuzjof"/>
+            </g>
+            <g fill="#fdf8ea" opacity=".4" data-page-node-id="uQeXyOoeXfEokApHGfQS1B">
+              <ellipse cx="31" cy="60" rx="9" ry="13" data-page-node-id="NcI2EiYFwT7bD1jhrdwoVd"/><ellipse cx="95" cy="42" rx="10" ry="14" data-page-node-id="88QJgshbM9nlck8X9Vubpv"/><ellipse cx="160" cy="62" rx="8" ry="12" data-page-node-id="DAHSCzc0FVdTxGmLBg4cyl"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="piece k-balls-r" data-page-node-id="d1XVEmxW6BQirtvkSsXq4y">
+          <svg viewBox="0 0 220 300" data-page-node-id="FEFbNzsDyF6x0Ots5j8w8A">
+            <g stroke="#fdf8ea" stroke-width="3.6" fill="none" stroke-linecap="round" data-page-node-id="9C2u7SfhkxrhO4nGfqdT8z">
+              <path d="M44,120 q-11,82 4,170" data-page-node-id="LCq56Fsx5NsuVF2DQkfAAx"/>
+              <path d="M108,104 q10,92 -4,186" data-page-node-id="owyTmHZpuKPAKlekrbLWH0"/>
+              <path d="M172,118 q-10,84 5,172" data-page-node-id="jF5KlPy2CaiTEvUOC7Klru"/>
+            </g>
+            <g stroke="#fdf8ea" stroke-width="3.6" data-page-node-id="3llyQXHKWIxNhGRPriEMsk">
+              <ellipse cx="44"  cy="76" rx="31" ry="40" fill="#8e83cf" data-page-node-id="mTVyuUBEAF8ereQbfkr9Ya"/>
+              <ellipse cx="108" cy="58" rx="36" ry="46" fill="#eda9b4" data-page-node-id="k6uYjtJrsgP0309RfiXUV6"/>
+              <ellipse cx="172" cy="74" rx="33" ry="42" fill="#6f9478" data-page-node-id="v91hy7Bx2M39GB4kbUCESi"/>
+            </g>
+            <g fill="#fdf8ea" data-page-node-id="AFFGgLwre21Ikyt6kAAQtT">
+              <path d="M44,112 l-7,9 14,0 Z" data-page-node-id="vWINFLNH8AHJnAUrloYhL6"/><path d="M108,100 l-7,9 14,0 Z" data-page-node-id="pHAboq5TsaJcfDDBQd3x6s"/><path d="M172,112 l-7,9 14,0 Z" data-page-node-id="JOaW6fhpr75KtFfifTr9ps"/>
+            </g>
+            <g fill="#fdf8ea" opacity=".4" data-page-node-id="OtqBDju7DKINAu72Idibn5">
+              <ellipse cx="33" cy="62" rx="8" ry="12" data-page-node-id="hw7EBbye9OY6NOUUPzlxRd"/><ellipse cx="95" cy="42" rx="10" ry="14" data-page-node-id="UfPB3Vu7jTt4W4hhDQcHrB"/><ellipse cx="162" cy="60" rx="9" ry="13" data-page-node-id="SeS6bVyk8N5HC3Jf8XrAhm"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- ============ 蛋糕（正中） ============ -->
+        <div class="piece k-cake" data-page-node-id="NKU2Iqci0AxUkYcAzNP8wl">
+          <svg viewBox="0 0 280 300" data-page-node-id="DHec5EwTtu2Kl1nvCYzjhz">
+            <path d="M118,250 l0,44 44,0 0,-44 Z" fill="#d8503c" stroke="#fdf8ea" stroke-width="3" data-page-node-id="NIZoojGFuxOGQLV9lxKi7p"/>
+            <path d="M112,244 h56 v12 h-56 z" fill="#eda9b4" stroke="#fdf8ea" stroke-width="3" data-page-node-id="YQOntHU4KLDyLQT3CU0EzK"/>
+            <ellipse cx="140" cy="248" rx="104" ry="16" fill="#a8c4ac" stroke="#fdf8ea" stroke-width="3" data-page-node-id="3GEFXuS7Jk0lcRRbPnXJUN"/>
+            <path d="M40,196 L36,242 Q140,262 244,242 L240,196 Z" fill="#eda9b4" stroke="#fdf8ea" stroke-width="3" data-page-node-id="7KcLv8wTPE0DFXKllDvCx6"/>
+            <path d="M40,196 Q140,216 240,196 L240,206 Q140,226 40,206 Z" fill="#fdf8ea" opacity=".85" data-page-node-id="2DJrF3jxx9jNoYDhPbyqEW"/>
+            <g fill="#8e83cf" data-page-node-id="T1jUUUaDA7u3oWO1ZsCGrO"><circle cx="80" cy="222" r="5" data-page-node-id="moxz1F6lSDCOIGOkPl1aYL"/><circle cx="140" cy="230" r="5" data-page-node-id="lreWJuYIc3wb6LXUVna7hL"/><circle cx="200" cy="222" r="5" data-page-node-id="62d3DR2IWMe0ApnL8UCiX0"/></g>
+            <path d="M62,134 L58,196 Q140,212 222,196 L218,134 Z" fill="#fdf6e2" stroke="#fdf8ea" stroke-width="3" data-page-node-id="TLFBXuATVNzYy6oFdcNQCu"/>
+            <path d="M62,148 q10,12 22,0 q10,12 22,0 q10,12 22,0 q10,12 22,0 q10,12 22,0 q10,12 22,0 q10,12 22,0 l0,-8 -154,0 Z" fill="#eda9b4" data-page-node-id="NiAvXKvt1AVQp4Y9Uikq5J"/>
+            <g fill="#d8503c" data-page-node-id="xcCAy6YaD9Tw184Bzie8o8"><circle cx="96" cy="176" r="4.5" data-page-node-id="Tc7QXwloHKHnPe04ULBmaI"/><circle cx="140" cy="182" r="4.5" data-page-node-id="xAnQKbwZidWFiEEyakOT32"/><circle cx="184" cy="176" r="4.5" data-page-node-id="umsWszKQ01C60jzpbEymlu"/></g>
+            <path d="M86,86 L82,134 Q140,148 198,134 L194,86 Z" fill="#eda9b4" stroke="#fdf8ea" stroke-width="3" data-page-node-id="lVpy60AsKu200O1zXmDAFT"/>
+            <path d="M86,96 q9,11 19,0 q9,11 19,0 q9,11 19,0 q9,11 19,0 q9,11 19,0 q9,11 18,0 l0,-6 -114,0 Z" fill="#fdf8ea" data-page-node-id="AyipFilALaHLSYmFcY5ZLW"/>
+            <g fill="#fdf8ea" data-page-node-id="y6oMQphL3nNEJMMATzZU0c"><circle cx="112" cy="120" r="4" data-page-node-id="BWWqkfblzlDhMf21ou1DjD"/><circle cx="140" cy="126" r="4" data-page-node-id="5RtJF3iNL96gFhJ8QGUKup"/><circle cx="168" cy="120" r="4" data-page-node-id="ERV4Xi5OJbyiIfFey6dETK"/></g>
+            <g stroke="#fdf8ea" stroke-width="2.5" data-page-node-id="qBfsjG9zv7Aczo1e5pVbOU">
+              <circle cx="106" cy="82" r="10" fill="#e9b84c" data-page-node-id="f4HsX8s4hsiIYEsAUV6GkC"/>
+              <circle cx="128" cy="76" r="9" fill="#d8503c" data-page-node-id="FVgw8UFKDcVFxH6DegAGGk"/>
+              <circle cx="152" cy="74" r="10" fill="#e9d24c" data-page-node-id="wSqnsDZfh93N6JBpuh7TJb"/>
+              <circle cx="174" cy="80" r="9" fill="#6f9478" data-page-node-id="SAVWIR6PlEJbK3c6jcpVHa"/>
+            </g>
+            <g stroke="#fdf8ea" stroke-width="2.5" data-page-node-id="oCcZV7QqMBgjcXQs9dGj5d">
+              <rect x="112" y="26" width="9" height="46" rx="4" fill="#8e83cf" data-page-node-id="WzqcTmCxAeZVvJi6CGFRaE"/>
+              <rect x="136" y="20" width="9" height="52" rx="4" fill="#eda9b4" data-page-node-id="PWAJlO9TxHfo0DXbgBFF6z"/>
+              <rect x="160" y="26" width="9" height="46" rx="4" fill="#a8c4ac" data-page-node-id="KBOL4pe9nE3zyHdBmK3XcJ"/>
+            </g>
+            <g stroke="#fdf8ea" stroke-width="1.6" opacity=".85" data-page-node-id="1e0tkDtBluHVaRizCHydAD">
+              <path d="M112,36 l9,-6 M112,48 l9,-6 M136,30 l9,-6 M136,42 l9,-6 M160,36 l9,-6 M160,48 l9,-6" data-page-node-id="8slJy2Mo2ooXtC9nmSDzc0"/>
+            </g>
+            <g class="flame" data-page-node-id="xRYbAG7NDExALgvWlLnDu9">
+              <ellipse cx="116.5" cy="16" rx="6" ry="10" fill="#f2b23b" data-page-node-id="7Pe9IlK2YkghSXPbbdt4LZ"/>
+              <ellipse cx="140.5" cy="10" rx="6" ry="10" fill="#f2b23b" data-page-node-id="3wctAD5pTP2SHuKyWWLbWP"/>
+              <ellipse cx="164.5" cy="16" rx="6" ry="10" fill="#f2b23b" data-page-node-id="1aAkvRIGu6hBFjWCJ67Gj9"/>
+              <ellipse cx="116.5" cy="19" rx="3" ry="5" fill="#fde28a" data-page-node-id="uvOOVrFyndsjHNSVJSI8uD"/>
+              <ellipse cx="140.5" cy="13" rx="3" ry="5" fill="#fde28a" data-page-node-id="pLFuZEFpNoHMEnqHLcIuPA"/>
+              <ellipse cx="164.5" cy="19" rx="3" ry="5" fill="#fde28a" data-page-node-id="RCVB8qZmxe7C6oBGn0KrGX"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- ============ 前缘横幅 ============ -->
+        <div class="piece k-banner" data-page-node-id="PrQMwaGsC1DMRoCcfEFhGA">
+          <svg viewBox="0 0 380 108" data-page-node-id="G5h5Fy4tdn2nljPZErnsam">
+            <rect x="0" y="0" width="380" height="96" rx="10" fill="#e9b84c" stroke="#fdf8ea" stroke-width="4" data-page-node-id="lBJDUMVzl0kJFDzFEEEaXk"/>
+            <path d="M14,96 l0,12 24,-12 Z" fill="#c9942c" data-page-node-id="bgznABdqEt0pQkl5pQwpNO"/>
+            <path d="M366,96 l0,12 -24,-12 Z" fill="#c9942c" data-page-node-id="Z9CZcZ7AihcMhRQmmhqrab"/>
+            <text x="190" y="62" text-anchor="middle" font-size="40" font-weight="bold" fill="#2f6b53"
+              style="font-family:'Segoe Print','Comic Sans MS',cursive" data-page-node-id="Frp2QrXyHFs29zaeUZGdta">Happy Birthday!</text>
+            <circle cx="40" cy="22" r="5" fill="#d8503c" data-page-node-id="Ixr0HLWn5gc6L2S5FyXstS"/><circle cx="340" cy="22" r="5" fill="#6f9478" data-page-node-id="A1S5NSJuhQdPEOo61mBD2q"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ================= 封盖 ================= -->
+      <div class="lid" data-page-node-id="G6cvDEUHuy627MWfm5SNg8">
+        <div class="lid-face lid-cover" data-page-node-id="tfFIz4eFzlCWl9SqfXdbke">
+          <!-- 封面：米白纸 + 蜡笔描边 + 手写中文标题 + 红花 + 草莓熊 -->
+          <svg class="cover-art" viewBox="0 0 800 520" preserveAspectRatio="none" data-page-node-id="uBwgQBkQtMBU4wnWfMC7oO">
+            <rect width="800" height="520" fill="#f9f2e1" data-page-node-id="PhRNAPHhV9xuhnuYh7cMm8"/>
+            <rect width="800" height="520" fill="#7a6242" opacity=".055" style="filter:url(#paperGrain)" data-page-node-id="Vz01yJkCBkgxF63EqUDaWa"/>
+
+            <!-- 紫色细框（蜡笔手绘感） -->
+            <rect x="26" y="26" width="748" height="468" rx="10" fill="none"
+                  stroke="#8e83cf" stroke-width="2.2" opacity=".55" filter="url(#rough)" data-page-node-id="pCaDVdREU17z2OuedRhL3U"/>
+
+            <!-- 顶部小标签 -->
+            <g transform="translate(64,92) rotate(-1.6)" data-page-node-id="iURmFwsYd11J08jPeFYgeS">
+              <rect width="216" height="36" rx="9" fill="#e9b84c" opacity=".92" data-page-node-id="kzxPPfbACKBBAtc7y8F5Yv"/>
+              <text x="108" y="24" text-anchor="middle" font-size="13" letter-spacing="3.2" fill="#4a3b2f"
+                    style="font-family:Georgia,'Times New Roman',serif" data-page-node-id="xw2zbEqzU9mg4NZCPsaQwo">HAPPY BIRTHDAY</text>
+            </g>
+
+            <!-- 大标题 -->
+            <g style="font-family:'KuaiLe','STHupo','YouYuan','幼圆',sans-serif" data-page-node-id="j5P2TIGQg8DiNHuNQHe9Ft">
+              <text x="58"  y="250" font-size="122" fill="#2f6b53" transform="rotate(-2.6 58 250)" data-page-node-id="asmksdcGodVBHQnLnIPitD">生</text>
+              <text x="194" y="244" font-size="122" fill="#2f6b53" transform="rotate(2.2 194 244)" data-page-node-id="xgQGmjCoJ4obrsEREnFtF0">日</text>
+              <text x="56"  y="366" font-size="122" fill="#d8503c" transform="rotate(2.4 56 366)" data-page-node-id="AY4J09qPTwG3Ipn5UsAFcG">快</text>
+              <text x="192" y="370" font-size="122" fill="#d8503c" transform="rotate(-2.4 192 370)" data-page-node-id="DvOHccM1eFxmBgpInjJh39">乐</text>
+            </g>
+
+            <!-- 波浪红线 + 副标题 -->
+            <path d="M66,420 q26,-13 52,0 q26,13 52,0 q26,-13 52,0 q26,13 52,0"
+                  fill="none" stroke="#d8503c" stroke-width="3.4" stroke-linecap="round"
+                  opacity=".82" filter="url(#rough)" data-page-node-id="QMGHwEIRLGVD5NjbnOEksu"/>
+            <text x="66" y="458" font-size="21" fill="#4a3b2f" opacity=".72"
+                  style="font-family:'Segoe Script','Bradley Hand','Segoe Print',cursive;font-style:italic" data-page-node-id="6UHbABIyYDXGLr2d6GbH7i">for the three of us ♡</text>
+
+            <!-- 金木樨色星星 -->
+            <g data-page-node-id="8TkbG0EEDQpJCvnlLwLpeh">
+              <use href="#star5" transform="translate(386,144) scale(1.05)" fill="#e9b84c" opacity=".9" data-page-node-id="5I19hJGupyzWuTqLAHUS9C"/>
+              <use href="#star5" transform="translate(340,306) scale(.6)" fill="#6f9478" opacity=".8" data-page-node-id="HADhjDqV1UOe026EtO25zp"/>
+              <use href="#star5" transform="translate(392,392) scale(.45)" fill="#8e83cf" opacity=".7" data-page-node-id="rhjEwG6UDWvvCkKTyFysXB"/>
+              <circle cx="430" cy="228" r="3.4" fill="#d8503c" opacity=".7" data-page-node-id="0DW7oIxMWLfP1QpgwSjMJO"/>
+              <circle cx="300" cy="120" r="3" fill="#e9b84c" opacity=".85" data-page-node-id="uDAcWyZsGyrTOdXRhn1EVm"/>
+            </g>
+
+            <!-- 红花 + 枝叶 -->
+            <g data-page-node-id="kFBrI8YvkwzLOgfKezlCjH">
+              <path d="M640,208 q-26,116 -86,214" fill="none" stroke="#2f6b53" stroke-width="9" stroke-linecap="round" opacity=".9" data-page-node-id="O46kVNE15GpKuLwL8GHAgP"/>
+              <ellipse cx="572" cy="322" rx="46" ry="21" transform="rotate(-26 572 322)" fill="#6f9478" opacity=".95" data-page-node-id="WIcysy7ItoNGSKIV2XJ2vE"/>
+              <ellipse cx="612" cy="404" rx="38" ry="18" transform="rotate(16 612 404)" fill="#8fae97" opacity=".95" data-page-node-id="sC3lngTKBvp44WO7cTO7hI"/>
+              <g transform="translate(640,178)" data-page-node-id="Cv7iBP1goHEU8A2t0qzPLH">
+                <g fill="#c04533" opacity=".95" data-page-node-id="S6OegeKX0xMZkbJParbmit">
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(30)" data-page-node-id="AFdaQl6w8jvfkDH3lDz20v"/>
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(90)" data-page-node-id="pHnsjltmcH9FVq48kj9b5l"/>
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(150)" data-page-node-id="W5B5E4kn8JI5FMRhcHUUqX"/>
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(210)" data-page-node-id="C8bMPgFjaMEkhAc4URfmvm"/>
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(270)" data-page-node-id="LPBlZc6GDP8c4pn320f4el"/>
+                  <ellipse cx="0" cy="-52" rx="35" ry="50" transform="rotate(330)" data-page-node-id="jOHy4IbYl2BjTUywVmliLf"/>
+                </g>
+                <g fill="#d8503c" data-page-node-id="APAI4o5Ph9bKNgSIgKJsjz">
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(0)" data-page-node-id="rGc2bWoZlps7Qav9mLJlTb"/>
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(60)" data-page-node-id="EjGAXtV89O1k0j2qREzp0P"/>
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(120)" data-page-node-id="cDKxwQ1oX4WPVD7MeFiq7R"/>
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(180)" data-page-node-id="emGNDJmNk6PXSMkXufqAAR"/>
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(240)" data-page-node-id="a9kEHgeSxw17nOGaU0lNzl"/>
+                  <ellipse cx="0" cy="-48" rx="32" ry="46" transform="rotate(300)" data-page-node-id="buWU14A3p8GoEDJYQ0vKXs"/>
+                </g>
+                <circle r="30" fill="#e9b84c" data-page-node-id="Zz0E2TTVlvaM6R3HpnIAUu"/>
+                <circle r="30" fill="none" stroke="#c9942c" stroke-width="2.2" opacity=".7" data-page-node-id="dVSbMBMw17AIvO17jNz1NI"/>
+                <g fill="#c9942c" data-page-node-id="G4h9MkY9Rpjlz03ZEAYb1J">
+                  <circle cx="-9" cy="-7" r="3" data-page-node-id="ysnmjjm83ps5RlPxQRjIN7"/><circle cx="7" cy="-9" r="2.6" data-page-node-id="fhG85SLNFWzjpQDnMDWX0l"/>
+                  <circle cx="10" cy="6" r="3" data-page-node-id="ZWPZRDy9ywhysGdfImHAvL"/><circle cx="-6" cy="9" r="2.6" data-page-node-id="jzSDxYwrqGHIDrlrQx1Go1"/>
+                  <circle cx="0" cy="0" r="2.4" data-page-node-id="W6m9MB3jflMfoywDOfOc3k"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- 左下小涂鸦 -->
+            <g opacity=".6" data-page-node-id="htgIddRTOZTtlrRMRUIaWk">
+              <path d="M74,472 q9,-9 18,0 q9,9 18,0" fill="none" stroke="#6f9478" stroke-width="2.6" stroke-linecap="round" data-page-node-id="JL1AfMktykLfJNQ4cOd5JV"/>
+              <circle cx="126" cy="482" r="3.2" fill="#e9b84c" data-page-node-id="sh9w7hFde3zWMJUqo34OeC"/>
+            </g>
+          </svg>
+
+          <img class="cover-bear" src="assets/illus/lotso.png" alt="" data-page-node-id="XW8NlQBqYaFeIRP7xAiX0K">
+        </div>
+
+        <!-- 后墙场景：蜡笔纸片风 -->
+        <div class="lid-face lid-scene" data-page-node-id="WlDQ2fGgRV6HGsldXsn3kj">
+          <div class="scene-inner" data-page-node-id="1aanLR9uiofTyCuU0FwUQZ">
+            <svg class="wall-art" viewBox="0 0 800 520" preserveAspectRatio="none" data-page-node-id="ofHAjpPt17ng6cj8epxln3">
+              <rect width="800" height="520" fill="#f9f2e1" data-page-node-id="s9TLZyOoiBmG9y3VPzRJDT"/>
+              <rect width="800" height="520" fill="#7a6242" opacity=".05" style="filter:url(#paperGrain)" data-page-node-id="En507wDuX0pGQBmKBaai9f"/>
+
+              <!-- 拱门（蜡笔涂抹） -->
+              <g filter="url(#rough)" data-page-node-id="xchjqBn9kM9voa5DKhZzo1">
+                <path d="M148,520 V252 A252,202 0 0 1 652,252 V520 Z" fill="#a8c4ac" opacity=".5" data-page-node-id="5lPXZskf4rj7v1uVjbSStB"/>
+                <path d="M148,520 V252 A252,202 0 0 1 652,252 V520" fill="none" stroke="#6f9478" stroke-width="5" opacity=".55" data-page-node-id="GHNwwVaYq8it9jYksHEnnX"/>
+              </g>
+              <!-- 拱门内的白色涂鸦弧线 -->
+              <g fill="none" stroke="#fdf8ea" stroke-width="7" opacity=".55" stroke-linecap="round" data-page-node-id="lEW4seJvlslqTLLQd6kb5H">
+                <path d="M196,520 V266 A204,164 0 0 1 604,266 V520" data-page-node-id="zQj5aejmpCaXGROXUmIPiW"/>
+                <path d="M244,520 V280 A156,126 0 0 1 556,280 V520" data-page-node-id="tzNarpZcOuPOjeBiTnFJT8"/>
+                <path d="M292,520 V296 A108,92 0 0 1 508,296 V520" data-page-node-id="sYCBZlB1ABXGDxxmbYWQlF"/>
+              </g>
+
+              <!-- 底部草叶 -->
+              <g stroke="#6f9478" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7" data-page-node-id="2E0cnTrDkLpoL3e8jCLo1v">
+                <path d="M120,520 q4,-38 -10,-58" data-page-node-id="tDCFvpg8Fn8zJpHM7UxsvF"/><path d="M136,520 q2,-30 14,-46" data-page-node-id="CaGLxL52GIrUMLrH5gGkWY"/>
+                <path d="M660,520 q-4,-40 10,-60" data-page-node-id="jkGm2yYtqoxaKnu0K6xbTa"/><path d="M676,520 q-2,-30 -14,-46" data-page-node-id="QW69989fMWpqFsWdboZYqC"/>
+                <path d="M300,520 q4,-26 -6,-40" data-page-node-id="S3cCHbSDhuq26vOuBy6hr0"/><path d="M508,520 q-4,-26 6,-40" data-page-node-id="6pZ2kkHCBadFnjIW7y3znE"/>
+              </g>
+
+              <!-- 右上小红花 -->
+              <g transform="translate(700,132) scale(.52)" data-page-node-id="cTAmFcgD1qTzJweJNoR446">
+                <path d="M-4,52 q10,70 -18,120" fill="none" stroke="#6f9478" stroke-width="10" stroke-linecap="round" opacity=".8" data-page-node-id="ZB7JfizMaOb8T2F5p3Pg7G"/>
+                <ellipse cx="-34" cy="150" rx="40" ry="18" transform="rotate(-22 -34 150)" fill="#8fae97" data-page-node-id="DnWmkUQhldF8h282lJpek3"/>
+                <g fill="#c04533" opacity=".9" data-page-node-id="majnUJnL79NXNMjgr3VgME">
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(30)" data-page-node-id="GYPY813DBK1N4wm8QxqXSh"/>
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(90)" data-page-node-id="b5CpLrIkFdJsQ0BgDnlWLc"/>
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(150)" data-page-node-id="LS2JfbMqPdZZtKAWGvVsCP"/>
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(210)" data-page-node-id="yBY0CxodxdXFdf0xEGkiTD"/>
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(270)" data-page-node-id="F5areBbpKR3H9j6rH4bkqh"/>
+                  <ellipse cx="0" cy="-50" rx="33" ry="47" transform="rotate(330)" data-page-node-id="KsFAbhlXanvrqnAHARnast"/>
+                </g>
+                <g fill="#d8503c" data-page-node-id="088XHW8or9lJh1gexSEaFH">
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(0)" data-page-node-id="7RActR5ZM6GeBjRiIBiDmO"/>
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(60)" data-page-node-id="Zgh1EinQhGS6FnUYDBtXI5"/>
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(120)" data-page-node-id="iiBquQCwHUYzM7axgKVwTF"/>
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(180)" data-page-node-id="T2VBzr2satBosAfJthdBRD"/>
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(240)" data-page-node-id="Wmv0Qz9KNVtDNvwM7PpfcN"/>
+                  <ellipse cx="0" cy="-46" rx="30" ry="43" transform="rotate(300)" data-page-node-id="HRLt1SGZwIPPvsHIBBU78g"/>
+                </g>
+                <circle r="26" fill="#e9b84c" data-page-node-id="IOUfDnE93pimYtRs98gSDa"/>
+                <circle r="26" fill="none" stroke="#c9942c" stroke-width="2" opacity=".7" data-page-node-id="kgS9whhqdJGlA5n5Uj5AHT"/>
+              </g>
+
+              <!-- 左下小枝 -->
+              <g transform="translate(112,436) scale(.34)" opacity=".9" data-page-node-id="2XOzVQzneaEknYHHOIlr8m">
+                <g fill="#d8503c" data-page-node-id="Ya5vjSru0EQQaZW3JEAlvU">
+                  <ellipse cx="0" cy="-30" rx="20" ry="28" transform="rotate(0)" data-page-node-id="CVpIEknYxqZtwv4dLNYLxT"/>
+                  <ellipse cx="0" cy="-30" rx="20" ry="28" transform="rotate(72)" data-page-node-id="SeFWzBFf5M2CUCnvwlD5Ec"/>
+                  <ellipse cx="0" cy="-30" rx="20" ry="28" transform="rotate(144)" data-page-node-id="7HZbyz60mLDIhdklcR2VqA"/>
+                  <ellipse cx="0" cy="-30" rx="20" ry="28" transform="rotate(216)" data-page-node-id="jr9WDZ5sP1AncyVLvKA6XH"/>
+                  <ellipse cx="0" cy="-30" rx="20" ry="28" transform="rotate(288)" data-page-node-id="4NJqAkhUljV5P1pSOJEzXB"/>
+                </g>
+                <circle r="15" fill="#e9b84c" data-page-node-id="PBHMP0B7c31QOnsFTkdGIQ"/>
+                <path d="M0,14 q6,44 -6,66" fill="none" stroke="#6f9478" stroke-width="8" stroke-linecap="round" data-page-node-id="JLefT4YhbIuYktut4EhLnG"/>
+              </g>
+
+              <!-- 星星与点 -->
+              <g opacity=".8" data-page-node-id="sgVsIvMt2zcMGhJIxxSFM9">
+                <use href="#star5" transform="translate(232,166) scale(.6)" fill="#e9b84c" data-page-node-id="Tf6DMvDv4wXeorE7PBSlMB"/>
+                <use href="#star5" transform="translate(566,120) scale(.44)" fill="#e9b84c" data-page-node-id="EeHdB0vcURJOIpJBpiZ9Ah"/>
+                <use href="#star5" transform="translate(618,318) scale(.5)" fill="#8e83cf" data-page-node-id="k4fFFEs9M81GJXV0kDaBPA"/>
+                <use href="#star5" transform="translate(184,300) scale(.42)" fill="#d8503c" data-page-node-id="hWV1CviCgZH7g8zCS9JXvS"/>
+                <circle cx="410" cy="120" r="3.4" fill="#6f9478" data-page-node-id="qwGolxy2dwegVqJ0zwBiIS"/>
+                <circle cx="500" cy="176" r="2.8" fill="#e9b84c" data-page-node-id="eVwxB0jBAFGuAanrRt7bD7"/>
+                <circle cx="300" cy="236" r="2.6" fill="#d8503c" data-page-node-id="DWcgkpYb1wyWu8eUIm37RL"/>
+                <use href="#star5" transform="translate(96,132) scale(.46)" fill="#6f9478" data-page-node-id="YI7I2sxk6JXbhwHRzGJ1I6"/>
+                <use href="#star5" transform="translate(760,86) scale(.36)" fill="#eda9b4" data-page-node-id="XzFYUm4X6ShnBINPfet1ik"/>
+                <circle cx="150" cy="78" r="3" fill="#8e83cf" data-page-node-id="y1YmNEmAvqRiYTcx2t5r7v"/>
+                <circle cx="716" cy="252" r="2.6" fill="#6f9478" data-page-node-id="nEfGiDjyhuyAj8GrNpcmSM"/>
+              </g>
+            </svg>
+          </div>
+
+          <!-- 彩旗（浮在墙前一层） -->
+          <div class="wall-bunting" data-page-node-id="H9hQIZbmDN4434AO79m1MN">
+            <svg viewBox="0 0 800 150" data-page-node-id="TDh4nbjGl6J6FzNGRWBDzW">
+              <path d="M8,26 Q400,84 792,26" stroke="#b08b56" stroke-width="2.4" fill="none" data-page-node-id="CgfACpkYM0vpV1FHcg8tiK"/>
+              <g stroke="#fdf8ea" stroke-width="3" stroke-linejoin="round" data-page-node-id="a2C8dKqEWEDt06p9OMhShc">
+                <path d="M40,27 l38,7 -29,50 Z" fill="#d8503c" data-page-node-id="tr0ZBvfgEUf6VF5ckRBYQG"/>
+                <path d="M112,38 l38,6 -28,51 Z" fill="#e9b84c" data-page-node-id="AKx4JFA5avdRiwWN9lP2TU"/>
+                <path d="M184,47 l38,5 -27,52 Z" fill="#2f6b53" data-page-node-id="kfPkL00lGNaWK2rihq0noA"/>
+                <path d="M256,54 l38,4 -26,52 Z" fill="#eda9b4" data-page-node-id="810vD3zjKWZTRUJkrwqhgU"/>
+                <path d="M328,59 l38,2 -25,53 Z" fill="#8e83cf" data-page-node-id="w95qSi6SMYsA8Xw9qu6nwp"/>
+                <path d="M472,59 l-38,-2 25,53 Z" fill="#a8c4ac" data-page-node-id="Z9zq6yfMv0SrNjw6kI8CbM"/>
+                <path d="M544,54 l-38,-4 26,52 Z" fill="#e9b84c" data-page-node-id="Aq1KUmwbZi5UUlmw8kRlWK"/>
+                <path d="M616,47 l-38,-5 27,52 Z" fill="#d8503c" data-page-node-id="vL31ko9bG0bYBLujKIR8wU"/>
+                <path d="M688,38 l-38,-6 28,51 Z" fill="#2f6b53" data-page-node-id="bFIeI5nyamz46uiQthdmf5"/>
+                <path d="M760,27 l-38,-7 29,50 Z" fill="#eda9b4" data-page-node-id="1HAu3Zip0byPrB8bBzh2Fd"/>
+              </g>
+            </svg>
+          </div>
+
+          <!-- 墙上散落的纸屑（悬浮层） -->
+          <div class="wall-stars" data-page-node-id="3xmVMvpLXRyeI3Av3RFBPJ">
+            <svg viewBox="0 0 800 520" preserveAspectRatio="none" data-page-node-id="FZg8uOLrbqdT1iXuEko7Pt">
+              <g fill="#e9b84c" opacity=".9" data-page-node-id="wqEuXIRoLlUbwfnraMYeVp">
+                <use href="#star5" transform="translate(150,206) scale(.5)" data-page-node-id="B5PuP8eebX69GoCn0zPtvF"/>
+                <use href="#star5" transform="translate(648,242) scale(.44)" data-page-node-id="0BAIvclMDsAj8W5bLVU90F"/>
+              </g>
+              <g opacity=".85" data-page-node-id="VPCBnEsD51zKWvFwhnziBA">
+                <rect x="96" y="266" width="7" height="12" rx="2" fill="#d8503c" transform="rotate(22 99 272)" data-page-node-id="DPLhxy1BZtwDqtyVCclT6s"/>
+                <rect x="238" y="360" width="7" height="12" rx="2" fill="#8e83cf" transform="rotate(-18 241 366)" data-page-node-id="3q8BJq07DpN2Ls8JrkhgTV"/>
+                <rect x="520" y="188" width="7" height="12" rx="2" fill="#6f9478" transform="rotate(30 523 194)" data-page-node-id="9ifHznX2HHn8yxaDOy2IMT"/>
+                <circle cx="410" cy="230" r="3.2" fill="#eda9b4" data-page-node-id="VbLuJ0w7kHvAwu2TEU4FW3"/>
+                <circle cx="600" cy="330" r="3" fill="#e9b84c" data-page-node-id="eFasabVt7S5YUjtKFvuJR7"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="air" id="air" data-page-node-id="V9KjoyQcc2Y46taWnGyGfd"></div>
+  <div class="confetti-layer" id="cfl" data-page-node-id="MnhWUIu5dC35hCVpdzQdVe"></div>
+</div>
+
+<button class="pill" id="pill" data-page-node-id="w3nqBvD21lre2dzBurdfpV">open me!</button>
+
+<audio id="bgm" src="assets/celebrate.mp3" loop preload="auto"></audio>
+<button class="music" id="musicBtn" type="button" aria-label="背景音乐开关">
+  <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V6.6l9-2.1v10.9"/>
+    <ellipse cx="6.6" cy="18.1" rx="2.6" ry="2.2"/>
+    <ellipse cx="15.6" cy="15.4" rx="2.6" ry="2.2"/>
+  </svg>
+  <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V6.6l9-2.1v10.9"/>
+    <ellipse cx="6.6" cy="18.1" rx="2.6" ry="2.2"/>
+    <ellipse cx="15.6" cy="15.4" rx="2.6" ry="2.2"/>
+    <path d="M3 3l18 18" stroke="#fdf8ea"/>
+  </svg>
+</button>
+<div class="hint" data-page-node-id="xrmYCznoHxbBLnwiRkI14g">点击贺卡或按钮打开 / 合上</div>
+
+<script>
+  const card = document.getElementById('card');
+  const pill = document.getElementById('pill');
+  const cfl  = document.getElementById('cfl');
+  const bgm  = document.getElementById('bgm');
+  const musicBtn = document.getElementById('musicBtn');
+  const openParam = new URLSearchParams(location.search).get('open');
+
+  /* ---------------- 背景音乐 ---------------- */
+  let musicOn = true;          // 用户意图：是否开声音
+  let musicReady = false;      // 音频是否真的在放
+
+  function playMusic(){
+    if(!bgm || !musicOn) return;
+    try{
+      bgm.currentTime = 0;
+      const p = bgm.play();
+      if(p && typeof p.then === 'function'){
+        p.then(()=>{ musicReady = true; syncMusicBtn(); })
+         .catch(()=>{ musicReady = false; syncMusicBtn(); });
+      }
+    }catch(e){ musicReady = false; syncMusicBtn(); }
+  }
+  function stopMusic(){
+    if(!bgm) return;
+    try{ bgm.pause(); }catch(e){}
+    musicReady = false;
+    syncMusicBtn();
+  }
+  function syncMusicBtn(){
+    if(!musicBtn) return;
+    musicBtn.classList.toggle('muted', !musicOn);
+    musicBtn.classList.toggle('playing', musicOn && musicReady);
+  }
+  if(musicBtn){
+    musicBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      musicOn = !musicOn;
+      if(musicOn){ playMusic(); } else { stopMusic(); }
+      syncMusicBtn();
+    });
+  }
+  syncMusicBtn();
+
+  /* ---------------- 状态 ---------------- */
+  function setOpen(v){ card.classList.toggle('open', v); pill.textContent = v ? 'close card' : 'open me!'; }
+
+  /* ---------------- 钱雨 ---------------- */
+  function moneyRain(){
+    cfl.innerHTML = '';
+    const NOTES = ['', '', '', 'gold', '', '', 'blue', ''];
+    const narrow = window.innerWidth < 700;           // 手机上卡片占比大，钱要小、要少
+    const total  = narrow ? 40 : 52;
+    for(let i=0;i<total;i++){
+      const isCoin = Math.random() < 0.15;
+      const el = document.createElement('i');
+      el.className = isCoin ? 'coin' : ('money ' + NOTES[i % NOTES.length]);
+      const scale = narrow ? (0.7 + Math.random()*0.34) : (0.9 + Math.random()*0.38);
+      el.style.left = (Math.random()*104 - 2) + '%';
+      el.style.setProperty('--sx', (Math.random()*180 - 90).toFixed(0) + 'px');
+      el.style.animationDuration = (2.8 + Math.random()*1.9).toFixed(2) + 's';
+      el.style.animationDelay = (Math.random()*1.15).toFixed(2) + 's';
+      el.style.width = (50*scale).toFixed(0) + 'px';
+      el.style.height = (26*scale).toFixed(0) + 'px';
+      el.style.fontSize = (16*scale).toFixed(0) + 'px';
+      if(isCoin){ el.style.width = el.style.height = (18*scale).toFixed(0) + 'px'; }
+      el.style.filter = 'brightness(' + (0.94 + Math.random()*0.12).toFixed(2) + ')';
+      // 落在画面中间（人物所在区）的钞票更透明，避免糊住脸
+      const xp = parseFloat(el.style.left);
+      el.style.setProperty('--maxo', (xp > 28 && xp < 74) ? '.8' : '.95');
+      cfl.appendChild(el);
+    }
+    setTimeout(()=>{ cfl.innerHTML=''; }, 7200);
+  }
+
+  function toggle(){
+    const opening = !card.classList.contains('open');
+    setOpen(opening);
+    if(opening){ moneyRain(); playMusic(); }
+    else { stopMusic(); }
+  }
+  card.addEventListener('click', toggle);
+  pill.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+  if(openParam === '1'){ card.classList.add('no-anim'); setOpen(true); }
+  if(new URLSearchParams(location.search).get('rain') === '1'){ setTimeout(moneyRain, 60); }
+
+  /* 音频自检：?audiotest=1 时把解码结果写进标题，便于无头验证 */
+  if(new URLSearchParams(location.search).get('audiotest') === '1' && bgm){
+    bgm.addEventListener('loadedmetadata', ()=>{ document.title = 'AUDIO_OK ' + bgm.duration.toFixed(2) + 's'; });
+    bgm.addEventListener('error', ()=>{ document.title = 'AUDIO_ERR ' + (bgm.error && bgm.error.code); });
+    setTimeout(()=>{ if(document.title.indexOf('AUDIO_') < 0) document.title = 'AUDIO_TIMEOUT ' + bgm.readyState; }, 4000);
+  }
+
+  /* 卡外飘散纸屑 */
+  (function(){
+    const box = document.getElementById('air'); if(!box) return;
+    const cols = ['#f0d98c','#e9c96f','#f7e8b6','#dcbf7d','#f3e2a4','#e3cd8b'];
+    let seed = 77713;
+    const rnd = () => (seed = (seed*9301 + 49297) % 233280) / 233280;
+    for(let i=0;i<26;i++){
+      const el = document.createElement('i');
+      const w = 6 + Math.round(rnd()*6);
+      el.style.left = (rnd()*100)+'%';
+      el.style.top = (rnd()*100)+'%';
+      el.style.width = w+'px';
+      el.style.height = (w*1.5)+'px';
+      el.style.background = cols[i % cols.length];
+      el.style.borderRadius = rnd()>.5 ? '50%' : '2px';
+      el.style.animationDelay = (rnd()*6).toFixed(2)+'s';
+      el.style.animationDuration = (5+rnd()*4).toFixed(2)+'s';
+      box.appendChild(el);
+    }
+  })();
+</script>
+</body>
+</html>

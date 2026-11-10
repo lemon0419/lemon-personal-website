@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { t } from '@/lib/i18n';
-import { ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer, Clock, EyeIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, FileText, ArrowUpRight, Library, Timer, Clock, EyeIcon, Gift } from 'lucide-react';
 import { useSpotlight } from '@/hooks/useSpotlight';
 
 // ========== 数据 ==========
@@ -343,6 +343,69 @@ function PomodoroCard({ locale }: { locale: 'zh' | 'en' }) {
   );
 }
 
+/* 生日贺卡卡片 — 竖版短视频预览的特写大卡 */
+function BirthdayCard({ locale }: { locale: 'zh' | 'en' }) {
+  const spotlightRef = useSpotlight<HTMLAnchorElement>();
+
+  return (
+    <a
+      ref={spotlightRef}
+      href="/works/birthday/index.html"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="spotlight-card group relative flex items-stretch gap-4 md:gap-6 bg-card border border-border/60 rounded-2xl overflow-hidden
+                 diffusion-shadow hover:border-primary/20 transition-all duration-400 p-4 md:p-5"
+    >
+      {/* 胶带 */}
+      <div
+        className="absolute -top-2 right-10 w-12 h-4 rotate-2 opacity-60 pointer-events-none"
+        style={{ background: 'hsl(45 70% 78%)', borderRadius: 2 }}
+      />
+
+      {/* 竖版视频预览 */}
+      <div
+        className="relative shrink-0 w-[104px] md:w-[128px] aspect-[9/16] rounded-xl overflow-hidden"
+        style={{ background: 'hsl(38 40% 91%)' }}
+      >
+        <video
+          src="/works/birthday/preview.mp4"
+          poster="/works/birthday/assets/cover-lily.png"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/80 dark:bg-black/50 backdrop-blur-sm text-[9px] font-bold tracking-wider text-foreground/70">
+          NEW
+        </span>
+      </div>
+
+      {/* 文案区 */}
+      <div className="relative z-10 flex flex-col flex-1 py-0.5 min-w-0">
+        <div className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-primary/10 text-[10px] font-medium text-primary mb-2">
+          <Gift className="w-3 h-3" />
+          <span>{t(locale, 'webProject')}</span>
+        </div>
+
+        <h4 className="text-sm md:text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors mb-1.5">
+          {t(locale, 'project4')}
+        </h4>
+
+        <p className="text-[11px] md:text-xs text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+          {t(locale, 'project4Desc')}
+        </p>
+
+        <div className="flex items-center gap-1 text-xs font-medium text-primary group-hover:text-accent transition-colors mt-2">
+          <span>{t(locale, 'viewProject')}</span>
+          <ArrowUpRight className="w-3 h-3" />
+        </div>
+      </div>
+    </a>
+  );
+}
+
 /* 公众号推文列表项 — 带缩略图 */
 function ArticleListItem({ article, locale, index }: { article: typeof ARTICLES[0]; locale: 'zh' | 'en'; index: number }) {
   const spotlightRef = useSpotlight<HTMLAnchorElement>();
@@ -494,6 +557,9 @@ export default function PortfolioSection() {
         <p className="text-xs text-muted-foreground font-medium pl-1" style={{ fontFamily: "'LXGW WenKai', sans-serif" }}>
           {t(locale, 'projectSection')}
         </p>
+
+        {/* 最新项目 — 贺卡特写卡 */}
+        <BirthdayCard locale={locale} />
 
         {/* 3列等大卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
